@@ -1,0 +1,45 @@
+.card-group.mdl-card {
+  width: 256px;
+  height: 256px;
+  float: left;
+  clear: left;
+  margin: 1rem;
+}
+
+
+.card-composition.mdl-card {
+  width: 256px;
+  height: 256px;
+  float: left;
+  margin: 1rem;
+}
+
+.card-composition.mdl-card:hover {
+  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2);
+}
+
+.card-composition > .mdl-card__title {
+  background: #009688;
+}
+.card-composition > .mdl-card__title > h6 {
+  /* margin-top: 0; */
+}
+.card-composition > .mdl-card__actions {
+  /* display: flex; */
+  box-sizing:border-box;
+  align-items: center;
+}
+.card-composition > .mdl-card__title {
+  color: #fff;
+}
+
+.card-composition > .mdl-card__actions .mdl-button {
+  min-width: 40px;
+  padding: 0 8px;
+}
+
+.card-composition > .mdl-tooltip > ul {
+  list-style-type: none;
+  text-align: left;
+  padding: 5px;
+}

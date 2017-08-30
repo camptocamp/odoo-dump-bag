@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dump Bag</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/material.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/odoo-dump-bag.css') }}">
+    <script src="{{ url_for('static', filename='js/material.min.js') }}"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <script>
+      'use strict';
+      // http://stackoverflow.com/questions/9899372/pure-javascript-equivalent-to-jquerys-ready-how-to-call-a-function-when-the/30319853#30319853
+      function r(f){
+        /in/.test(document.readyState) ? setTimeout('r(' + f + ')', 9) : f()
+      }
+      (function() {
+        'use strict';
+          r(function(){
+            var snackbarContainer = document.querySelector('#snackbar-flash');
+            {% for message in get_flashed_messages() %}
+              var data = {
+                message: '{{ message | safe }}',
+              };
+              snackbarContainer.MaterialSnackbar.showSnackbar(data);
+            {% endfor %}
+          });
+      }());
+    </script>
+  </head>
+  <body>
+    <!-- Uses a transparent header that draws on top of the layout's background -->
+    <style>
+    .layout-transparent {
+      background: url('{{ url_for('static', filename='img/transparent.jpg') }}') center / cover;
+    }
+    .layout-transparent .mdl-layout__header,
+    .layout-transparent .mdl-layout__drawer-button {
+      /* This background is dark, so we set text to white. Use 87% black instead if
+         your background is light. */
+      color: white;
+    }
+    </style>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">Dump Bag</span>
+          <!-- Add spacer, to align navigation to the right -->
+          <div class="mdl-layout-spacer"></div>
+          <!-- Navigation. We hide it in small screens. -->
+          <nav class="mdl-navigation mdl-layout--large-screen-only">
+            <a class="mdl-navigation__link" href="{{ url_for('databases') }}">
+              <i class="material-icons">code</i>
+            </a>
+            <a class="mdl-navigation__link" href="{{ url_for('dumps') }}">
+              <i class="material-icons">code</i>
+            </a>
+          </nav>
+        </div>
+      </header>
+      <main class="mdl-layout__content">
+        <div id="snackbar-flash" class="mdl-js-snackbar mdl-snackbar">
+          <div class="mdl-snackbar__text"></div>
+          <button class="mdl-snackbar__action" type="button"></button>
+        </div>
+        {% block body %}{% endblock %}
+      </main>
+      <footer class="mdl-mini-footer">
+        <div class="mdl-mini-footer__left-section">
+          <div class="mdl-logo">Dump Bag</div>
+          <ul class="mdl-mini-footer__link-list">
+            <li><a href="#">Help</a></li>
+          </ul>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

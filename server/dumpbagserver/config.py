@@ -12,4 +12,4 @@ class DumpBagConfig(object):
 
     # base_url = env['BASE_URL']
 
-    # main_container = env.get('ODOO_CONTAINER', 'odoo')
+    exclude_databases = env.get('BAG_EXCLUDE_DATABASE', [])

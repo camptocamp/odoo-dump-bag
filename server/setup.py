@@ -12,5 +12,6 @@ setup(
     ],
     tests_requires=[
         'pytest',
+        'mock',
     ],
 )

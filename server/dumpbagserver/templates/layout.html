@@ -50,10 +50,12 @@
           <!-- Navigation. We hide it in small screens. -->
           <nav class="mdl-navigation mdl-layout--large-screen-only">
             <a class="mdl-navigation__link" href="{{ url_for('databases') }}">
-              <i class="material-icons">code</i>
+              Databases
+              <i class="material-icons">rowing</i>
             </a>
             <a class="mdl-navigation__link" href="{{ url_for('dumps') }}">
-              <i class="material-icons">code</i>
+              Dumps
+              <i class="material-icons">storage</i>
             </a>
           </nav>
         </div>
@@ -66,12 +68,6 @@
         {% block body %}{% endblock %}
       </main>
       <footer class="mdl-mini-footer">
-        <div class="mdl-mini-footer__left-section">
-          <div class="mdl-logo">Dump Bag</div>
-          <ul class="mdl-mini-footer__link-list">
-            <li><a href="#">Help</a></li>
-          </ul>
-        </div>
       </footer>
     </div>
   </body>

@@ -3,7 +3,7 @@ FROM python
 COPY . /app
 WORKDIR /app
 
-RUN pip install uwsgi pytest pytest-runner
+RUN pip install uwsgi pytest pytest-runner mock
 RUN pip install -e .
 
 EXPOSE 5000

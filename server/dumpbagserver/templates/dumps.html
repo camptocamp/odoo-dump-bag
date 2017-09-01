@@ -3,7 +3,28 @@
 
 <div md>
 
-  Dumps
+  <h1>Dumps</h1>
+
+
+  {% for database, dumps in dumps.items() %}
+    <h2>{{database}}</h2>
+
+
+    <ul class="mdl-list dump-list">
+    {% for dump in dumps %}
+    <li class="mdl-list__item">
+      <span class="mdl-list__item-primary-content">{{dump}}</span>
+      <a
+        title="Download {{dump}}"
+        class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
+        >
+        <i class="material-icons">download</i>
+        Download
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
 
 </div>
 {% endblock %}

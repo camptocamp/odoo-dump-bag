@@ -31,3 +31,16 @@
   bottom: 0px;
   left: 50%;
 }
+
+
+.databases .progress {
+  width: 100%;
+}
+.databases .progress .bar {
+  width: 100%;
+  height: 12px;
+}
+.databases .progress .progress-caption {
+  width: 100%;
+  text-align: center;
+}

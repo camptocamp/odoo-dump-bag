@@ -19,6 +19,9 @@ class Bagger():
     def list_databases(self):
         return self.db.list_databases()
 
+    def has_dump_for_today(self, dbname):
+        return self.storage.has_dump_for_today(dbname)
+
     def bag_one_database(self, dbname):
         with self.db.create_temporary_dump_file(dbname) as (path, filename):
             # TODO: encrypt

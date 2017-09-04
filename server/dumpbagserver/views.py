@@ -2,7 +2,7 @@
 # License GPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from dumpbagserver import app, app_config
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, jsonify
 
 from .bagger import Bagger
 
@@ -26,6 +26,11 @@ def new_dump(dbname):
     filename = Bagger(app_config).bag_one_database(dbname)
     flash('dump {} has been pushed with filename {}'.format(dbname, filename))
     return redirect(url_for('dumps'))
+
+
+@app.route('/has_dump_for_today/<string:dbname>')
+def has_dump_for_today(dbname):
+    return jsonify(Bagger(app_config).has_dump_for_today(dbname))
 
 
 @app.route('/download/<string:db>/<string:filename>')

@@ -2,7 +2,14 @@
 {% set active_page = "databases" %}
 {% block body %}
 
-<div>
+<div class="databases">
+
+  <div class="progress" style="display: none;">
+    <div id="progress-bar"
+      class="mdl-progress mdl-js-progress mdl-progress__indeterminate bar">
+    </div>
+    <div class="progress-caption">Dump in progress, please wait</div>
+  </div>
 
   <ul class="mdl-list database-list">
     {% for dbname in databases | sort %}
@@ -11,13 +18,84 @@
         <a
           title="Push dump to storage"
           class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
-          href="{{ url_for('new_dump', dbname=dbname) }}">
+          onclick="askNewDump('{{dbname}}')"
+          >
+          <!-- href="{{ url_for('new_dump', dbname=dbname) }}" -->
           Create dump for {{dbname}} and push it!
         </a>
       </span>
     </li>
     {% endfor %}
   </ul>
+
+  <dialog class="mdl-dialog">
+    <h4 class="mdl-dialog__title">Really create a new dump?</h4>
+    <div class="mdl-dialog__content">
+      <p>
+      There is already a dump for this database for today,
+      unless this is really needed, use the existing one. Thanks!
+      </p>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" class="mdl-button confirm">I'm sure I need a new dump</button>
+      <button type="button" class="mdl-button close">Got it, close.</button>
+    </div>
+  </dialog>
+
+  <script>
+    var dialog;
+    function askNewDump(dbname) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'has_dump_for_today/' + dbname);
+      xhr.send(null);
+      xhr.onreadystatechange = function () {
+        var DONE = 4; // readyState 4 means the request is done.
+        var OK = 200; // status 200 is a successful return.
+        if (xhr.readyState === DONE) {
+          if (xhr.status === OK) {
+            var hasDump = JSON.parse(xhr.responseText);
+            if (hasDump) {
+              openDialog(dbname);
+            } else {
+              confirmNewDump(dbname);
+            }
+          } else {
+            console.log('Error: ' + xhr.status); // An error occurred during the request.
+          }
+        }
+      };
+    }
+
+    function confirmNewDump(dbname) {
+      document.querySelector('.progress').style.display = 'block';
+      document.location.href = 'dump/' + dbname;
+    }
+
+    function openDialog(dbname) {
+      var confirm = dialog.querySelector('.confirm');
+      // clean previous event listeners by replacing the element
+      var newConfirm = confirm.cloneNode(true);
+      confirm.parentNode.replaceChild(newConfirm, confirm);
+      newConfirm.addEventListener('click', function() {
+        dialog.close()
+        confirmNewDump(dbname);
+      });
+      dialog.showModal();
+    }
+
+    function setupDialog(dbname) {
+      var dialog = document.querySelector('dialog');
+      var showDialogButton = document.querySelector('#show-dialog');
+      if (! dialog.showModal) {
+        dialogPolyfill.registerDialog(dialog);
+      }
+      dialog.querySelector('.close').addEventListener('click', function() {
+        dialog.close();
+      });
+      return dialog;
+    }
+    dialog = setupDialog();
+  </script>
 
 </div>
 {% endblock %}

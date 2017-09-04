@@ -2,12 +2,14 @@
 # License GPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 import errno
+import itertools
 import json
 import logging
 import os
 import shutil
 import subprocess
 import tempfile
+import time
 
 from contextlib import contextmanager
 from subprocess import PIPE
@@ -65,6 +67,11 @@ class StorageCommander():
 
     def download_commands(self, dbname, filename):
         return [], {}
+
+    def has_dump_for_today(self, dbname):
+        dumps = self.list_by_db().get(dbname, [])
+        start = '%s-%s' % (dbname, time.strftime("%Y%m%d"))
+        return any(filename.startswith(start) for filename in dumps)
 
 
 class LocalStorageCommander(StorageCommander):

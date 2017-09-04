@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/material.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/odoo-dump-bag.css') }}">
     <script src="{{ url_for('static', filename='js/material.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <script>
@@ -40,6 +41,7 @@
       color: white;
     }
     </style>
+    {% set active_page = active_page | default('dumps') %}
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
@@ -49,13 +51,13 @@
           <div class="mdl-layout-spacer"></div>
           <!-- Navigation. We hide it in small screens. -->
           <nav class="mdl-navigation mdl-layout--large-screen-only">
-            <a class="mdl-navigation__link" href="{{ url_for('databases') }}">
-              Databases
-              <i class="material-icons">rowing</i>
-            </a>
-            <a class="mdl-navigation__link" href="{{ url_for('dumps') }}">
+            <a class="mdl-navigation__link {% if active_page == 'dumps' %} is-active {% endif %}" href="{{ url_for('dumps') }}">
               Dumps
               <i class="material-icons">storage</i>
+            </a>
+            <a class="mdl-navigation__link {% if active_page == 'databases' %} is-active {% endif %}" href="{{ url_for('databases') }}">
+              Databases
+              <i class="material-icons">rowing</i>
             </a>
           </nav>
         </div>

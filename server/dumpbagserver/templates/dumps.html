@@ -1,26 +1,32 @@
 {% extends "layout.html" %}
+{% set active_page = "dumps" %}
 {% block body %}
 
-<div md>
+<div class="dumps">
 
-  <h1>Dumps</h1>
-
-
-  {% for database, dumps in dumps.items() %}
+  {% for database, dumps in dumps | dictsort %}
     <h2>{{database}}</h2>
 
 
     <ul class="mdl-list dump-list">
-    {% for dump in dumps %}
-    <li class="mdl-list__item">
-      <span class="mdl-list__item-primary-content">{{dump}}</span>
-      <a
-        title="Download {{dump}}"
-        class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
-        >
-        <i class="material-icons">download</i>
-        Download
-      </a>
+    {% for dump in dumps | sort(reverse=True) %}
+    <li class="mdl-list__item-two-line">
+      <span
+        onclick="toggleVisibility('dumpinfo-box-{{dump}}')"
+        class="mdl-list__item-primary-content mdl-button mdl-js-button">
+        {{dump}}
+      </span>
+      <span id="dumpinfo-box-{{dump}}" class="mdl-list__item-secondary-content dumpinfo-box" style="display: none">
+        <strong>Commands</strong>
+        <pre>{{download_commands(database, dump)}}</pre>
+        <a
+          title="Download {{dump}}"
+          class="mdl-button mdl-js-button mdl-button--colored mdl-button--raised mdl-js-ripple-effect"
+          href="{{ url_for('download_dump', db=database, filename=dump) }}"
+          >
+          Download
+        </a>
+      </span>
     </li>
     {% endfor %}
   </ul>

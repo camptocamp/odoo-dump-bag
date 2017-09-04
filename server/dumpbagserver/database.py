@@ -2,6 +2,7 @@
 # License GPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 import errno
+import logging
 import os
 import subprocess
 import shutil
@@ -12,6 +13,9 @@ from subprocess import PIPE
 from contextlib import contextmanager
 
 from .exception import DumpingError
+
+
+_logger = logging.getLogger(__name__)
 
 
 class DatabaseOptions():
@@ -73,22 +77,36 @@ class PostgresDatabaseCommander(DatabaseCommander):
 
     """
 
+    def _env_variables(self):
+        vars = {'PGPASSWORD': self.options.password,
+                }
+        return vars
+
     def list_databases(self):
+        psql_env = os.environ.copy()
+        psql_env.update(**self._env_variables())
         command = [
             'psql',
             '--host', self.options.host,
             '--port', self.options.port,
             '--username', self.options.user,
             '--quiet', '--no-align', '--tuples-only',
+            '--dbname', 'postgres',
             '--command', 'SELECT datname FROM pg_database',
         ]
         proc = subprocess.Popen(
-            command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE
+            command, env=psql_env, stdin=PIPE, stdout=PIPE, stderr=PIPE
         )
-        stdout, _stderr = proc.communicate('%s\n' % (self.options.password,))
-        return stdout.split()
+        stdout, stderr = proc.communicate()
+        if proc.returncode:
+            _logger.error(
+                'error when listing databases:\n%s', stderr.decode('utf8')
+            )
+        return stdout.decode('utf8').split()
 
     def exec_dump(self, dbname, target):
+        psql_env = os.environ.copy()
+        psql_env.update(**self._env_variables())
         command = [
             'pg_dump',
             '--format', 'c',
@@ -97,11 +115,16 @@ class PostgresDatabaseCommander(DatabaseCommander):
             '--username', self.options.user,
             '--no-owner',
             '--file', target,
+            dbname
         ]
         proc = subprocess.Popen(
-            command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE
+            command, env=psql_env, stdin=PIPE, stdout=PIPE, stderr=PIPE
         )
-        stdout, _stderr = proc.communicate('%s\n' % (self.options.password,))
+        stdout, stderr = proc.communicate()
+        if proc.returncode:
+            _logger.error(
+                'error when creating dump:\n%s', stderr.decode('utf8')
+            )
 
 
 class PostgresOptions(DatabaseOptions):

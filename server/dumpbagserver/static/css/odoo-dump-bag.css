@@ -1,4 +1,33 @@
 .database-list {
-  width: 400px;
   margin: auto;
+}
+
+.dumps h2, h3 {
+  margin: 10px;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.dump-list li span {
+  text-transform: none;
+}
+
+
+.dumpinfo-box {
+  margin-left: 20px;
+}
+
+.mdl-navigation__link{
+  position: relative;
+
+}
+
+.mdl-navigation__link.is-active:after {
+  position: absolute;
+  content: '';
+  border-bottom: 4px solid #fff;
+  width: 70%;
+  transform: translateX(-50%);
+  bottom: 0px;
+  left: 50%;
 }

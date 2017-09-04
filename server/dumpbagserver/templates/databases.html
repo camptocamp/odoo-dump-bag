@@ -1,20 +1,20 @@
 {% extends "layout.html" %}
+{% set active_page = "databases" %}
 {% block body %}
 
 <div>
-  <h1>Databases</h1>
 
   <ul class="mdl-list database-list">
-    {% for dbname in databases %}
+    {% for dbname in databases | sort %}
     <li class="mdl-list__item">
-      <span class="mdl-list__item-primary-content">{{dbname}}</span>
-      <a
-        title="Push {{dbname}} to S3"
-        class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
-        href="{{ url_for('new_dump', dbname=dbname) }}">
-        <i class="material-icons">cloud upload</i>
-        Push to S3
-      </a>
+      <span class="mdl-list__item-primary-content">
+        <a
+          title="Push dump to storage"
+          class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
+          href="{{ url_for('new_dump', dbname=dbname) }}">
+          Create dump for {{dbname}} and push it!
+        </a>
+      </span>
     </li>
     {% endfor %}
   </ul>

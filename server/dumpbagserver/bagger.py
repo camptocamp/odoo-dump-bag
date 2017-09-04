@@ -1,3 +1,5 @@
+from string import Template
+
 from .database import DatabaseCommander, Database
 from .storage import StorageCommander
 
@@ -25,3 +27,29 @@ class Bagger():
 
     def list_dumps(self):
         return self.storage.list_by_db()
+
+    def read_dump(self, db, filename):
+        return self.storage.read_dump(db, filename)
+
+    def download_commands(self, dbname, dump):
+        lines = [
+            "# Using wget",
+            "$$ wget $base_url/download/$dbname/$dump",
+        ]
+        params = {
+            'base_url': self.config.base_url,
+            'dbname': dbname,
+            'dump': dump,
+        }
+        storage_command, storage_params = self.storage.download_commands(
+            dbname, dump
+        )
+        if storage_command:
+            lines.append('')
+            lines += storage_command
+        if storage_params:
+            params.update(storage_params)
+
+        tmpl = Template('\n'.join(lines))
+        s = tmpl.substitute(**params)
+        return s

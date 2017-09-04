@@ -5,8 +5,7 @@
 <div class="dumps">
 
   {% for database, dumps in dumps | dictsort %}
-    <h2>{{database}}</h2>
-
+    <h2><a name="{{database}}"></a>{{database}}</h2>
 
     <ul class="mdl-list dump-list">
     {% for dump in dumps | sort(reverse=True) %}
@@ -15,6 +14,9 @@
         onclick="toggleVisibility('dumpinfo-box-{{dump}}')"
         class="mdl-list__item-primary-content mdl-button mdl-js-button">
         {{dump}}
+      </span>
+      <span class="mdl-list__item-secondary-content">
+        {{ dump | date_from_dumpname }}
       </span>
       <span id="dumpinfo-box-{{dump}}" class="mdl-list__item-secondary-content dumpinfo-box" style="display: none">
         <strong>Commands</strong>

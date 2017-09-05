@@ -50,6 +50,10 @@ class Bagger():
             self.storage.push_to_storage(dbname, tmpdir, filename)
         return filename
 
+    def bag_all_databases(self):
+        for dbname in self.list_databases():
+            self.bag_one_database(dbname)
+
     def list_dumps(self):
         return self.storage.list_by_db()
 

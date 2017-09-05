@@ -32,6 +32,12 @@ def new_dump(dbname):
     return redirect(url_for('dumps', _anchor=dbname))
 
 
+@app.route('/dumpall')
+def dumpall():
+    Bagger(app_config).bag_all_databases()
+    return ''
+
+
 @app.route('/has_dump_for_today/<string:dbname>')
 def has_dump_for_today(dbname):
     return jsonify(Bagger(app_config).has_dump_for_today(dbname))

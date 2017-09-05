@@ -47,6 +47,7 @@
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
+          <div class="mdl-layout-icon"></div>
           <!-- Title -->
           <span class="mdl-layout-title">Dump Bag</span>
           <!-- Add spacer, to align navigation to the right -->
@@ -64,6 +65,20 @@
           </nav>
         </div>
       </header>
+     <div class="mdl-layout__drawer mdl-layout--small-screen-only">
+          <span class="mdl-layout-title">Dump Bag</span>
+          <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="{{ url_for('dumps') }}">
+              Dumps
+              <i class="material-icons">storage</i>
+            </a>
+            <a class="mdl-navigation__link" href="{{ url_for('databases') }}">
+              Databases
+              <i class="material-icons">rowing</i>
+            </a>
+          </nav>
+
+      </div>
       <main class="mdl-layout__content">
         <div id="snackbar-flash" class="mdl-js-snackbar mdl-snackbar">
           <div class="mdl-snackbar__text"></div>

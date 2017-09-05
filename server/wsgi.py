@@ -1,1 +1,1 @@
-from dumpbagserver import app as application
+from dumpbagserver import app as application  # noqa

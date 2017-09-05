@@ -9,7 +9,8 @@ from flask import render_template, redirect, url_for, flash, jsonify
 
 from .bagger import Bagger
 
-RE_DUMP_DATE = re.compile('.*(\d{8}-\d{6}).*')
+RE_DUMP_DATE = re.compile(r'.*(\d{8}-\d{6}).*')
+
 
 @app.route('/databases')
 def databases():

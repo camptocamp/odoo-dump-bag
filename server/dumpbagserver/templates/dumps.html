@@ -5,9 +5,12 @@
 <div class="dumps">
 
   {% for database, dumps in dumps | dictsort %}
-    <h2><a name="{{database}}"></a>{{database}}</h2>
+    <h2 class="dump-title" onclick="toggleGroup('dump-list-for-{{database}}', '{{database}}')">
+      <a name="{{database}}"></a>{{database}}
+    </h2>
 
-    <ul class="mdl-list dump-list">
+    <ul class="mdl-list dump-list" id="dump-list-for-{{database}}"
+      style="display: none">
     {% for dump in dumps | sort(reverse=True) %}
     <li class="mdl-list__item-two-line">
       <span
@@ -33,6 +36,35 @@
     {% endfor %}
   </ul>
   {% endfor %}
+
+  <script>
+
+  function toggleGroup(groupId, database) {
+    var groups = document.querySelectorAll('.dump-list');
+    var idx;
+    for (idx = 0; idx < groups.length; idx++) {
+      if (groups[idx].id !== groupId) {
+        groups[idx].style.display = 'none';
+      }
+    }
+    toggleVisibility(groupId);
+    // change the url to the db group
+    if(history.pushState) {
+      // on modern browser, change the anchor hash
+      // without moving the page to the anchor
+      history.pushState(null, null, '#' + database);
+    } else {
+      // fallback, it will move the window to the anchor
+      location.hash = '#' + database;
+    }
+  }
+
+  var hash = window.location.hash.substr(1);
+  if (hash) {
+    toggleVisibility('dump-list-for-' + hash);
+  }
+
+  </script>
 
 </div>
 {% endblock %}

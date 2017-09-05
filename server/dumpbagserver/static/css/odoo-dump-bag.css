@@ -8,6 +8,10 @@
   line-height: 20px;
 }
 
+.dump-title {
+  cursor: pointer;
+}
+
 .dump-list li span {
   text-transform: none;
 }

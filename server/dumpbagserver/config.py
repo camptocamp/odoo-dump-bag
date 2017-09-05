@@ -2,6 +2,7 @@
 from os import environ as env
 from .database import StaticOptions, PostgresOptions
 from .storage import LocalOptions, S3Options
+from .encryption import NoOpEncryptionOptions, GPGKeysOptions
 
 from .exception import DumpConfigurationError
 
@@ -68,5 +69,25 @@ class DumpBagConfig(object):
         else:
             raise DumpConfigurationError(
                 "'%s' is not a valid kind of storage among [local,s3]"
+                % (kind,)
+            )
+
+    def encryption_options(self):
+        kind = env.get('BAG_ENCRYPTION_KIND', 'none')
+        if kind == 'none':
+            return NoOpEncryptionOptions()
+        elif kind == 'gpg':
+            recipients = env.get('BAG_GPG_RECIPIENTS', '')
+            if not recipients:
+                raise DumpConfigurationError(
+                    "For GPG encryption, the following environment variables "
+                    "are required: \n"
+                    " - BAG_GPG_RECIPIENTS"
+                )
+            recipients = [r.strip() for r in recipients.split(',')]
+            return GPGKeysOptions(recipients)
+        else:
+            raise DumpConfigurationError(
+                "'%s' is not a valid kind of storage among [none,gpg]"
                 % (kind,)
             )

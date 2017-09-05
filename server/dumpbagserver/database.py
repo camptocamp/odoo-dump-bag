@@ -10,7 +10,6 @@ import time
 import tempfile
 
 from subprocess import PIPE
-from contextlib import contextmanager
 
 from .exception import DumpingError
 
@@ -155,21 +154,12 @@ class Database():
         now = time.strftime("%Y%m%d-%H%M%S")
         return '%s-%s.pg' % (dbname, now)
 
-    @contextmanager
-    def create_temporary_dump_file(self, dbname):
+    def create_dump_file(self, directory, dbname):
         databases = self.list_databases()
         if dbname not in databases:
             raise DumpingError('Database %s does not exist or is excluded'
                                % (dbname,))
         name = self._generate_dump_name(dbname)
-        tmpdir = tempfile.mkdtemp()
-        target = os.path.join(tmpdir, name)
-        try:
-            self.commander.exec_dump(dbname, target)
-            yield tmpdir, name
-        finally:
-            try:
-                shutil.rmtree(tmpdir)
-            except OSError as err:
-                if err.errno != errno.ENOENT:  # file does not exist
-                    raise
+        target = os.path.join(directory, name)
+        self.commander.exec_dump(dbname, target)
+        return name

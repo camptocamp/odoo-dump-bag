@@ -2,7 +2,6 @@
 # License GPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 import errno
-import itertools
 import json
 import logging
 import os
@@ -140,7 +139,7 @@ class S3StorageCommander(StorageCommander):
             _logger.error(
                 'error when running aws command:\n%s', stderr.decode('utf8'),
             )
-            raise DumpStorageError()
+            raise DumpStorageError(stderr.decode('utf8'))
         return stdout, stderr
 
     def push_to_storage(self, dbname, source_path, filename):

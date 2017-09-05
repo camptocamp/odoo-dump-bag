@@ -18,5 +18,9 @@ class DumpNotExistError(DumpBagError):
     """ Dump does not exist """
 
 
+class DumpEncryptionError(DumpBagError):
+    """ Error with the encryption """
+
+
 class DumpStorageError(DumpBagError):
     """ Error with the storage """

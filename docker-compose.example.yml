@@ -10,20 +10,43 @@ services:
     volumes:
       - "./server/:/app/"
     environment:
-      - FLASK_APP=dumpbagserver
-      - FLASK_SECRET_KEY='\xa3u\xd3\xc1P;\x1a/R\x0f\x82\xd2v,}\xee\xa3\xf5\x90\xe7\xe1\x0e\xcd\xe3'
-      - FLASK_DEBUG=true
-      - BAG_BASE_URL=http://localhost:5000
-      - BAG_EXCLUDE_DATABASE=template0,template1,postgres
-      # - BAG_DB_KIND=static
-      - BAG_DB_KIND=postgres
-      - BAG_DB_HOST=172.21.0.1
-      - BAG_DB_PORT=32770
-      - BAG_DB_USER=odoo
-      - BAG_DB_PASSWORD=odoo
-      # - BAG_STORAGE_KIND=local
-      # - BAG_STORAGE_LOCAL_DIR=/tmp
-      - BAG_STORAGE_KIND=s3
-      - BAG_S3_BUCKET_NAME=my-bucket
-      - BAG_S3_ACCESS_KEY=XXXX
-      - BAG_S3_SECRET_ACCESS_KEY=XXXX
+      FLASK_APP: dumpbagserver
+      FLASK_SECRET_KEY: '\xa3u\xd3\xc1P;\x1a/R\x0f\x82\xd2v,}\xee\xa3\xf5\x90\xe7\xe1\x0e\xcd\xe3'
+      FLASK_DEBUG: 'true'
+      BAG_BASE_URL: http://localhost:5000
+      BAG_EXCLUDE_DATABASE: template0,template1,postgres
+        # choose either static or postgres
+      # BAG_DB_KIND: static
+      BAG_DB_KIND: postgres
+      BAG_DB_HOST: 172.21.0.1
+      BAG_DB_PORT: 32770
+      BAG_DB_USER: odoo
+      BAG_DB_PASSWORD: odoo
+        # choose either local or s3
+      # BAG_STORAGE_KIND: local
+      # BAG_STORAGE_LOCAL_DIR: /tmp
+      BAG_STORAGE_KIND: s3
+      BAG_S3_BUCKET_NAME: odoo-dumps
+      BAG_S3_ACCESS_KEY: XXXX
+      BAG_S3_SECRET_ACCESS_KEY: XXXX
+        # choose either none or gpg
+      # BAG_ENCRYPTION_KIND: none
+      BAG_ENCRYPTION_KIND: gpg
+      BAG_GPG_RECIPIENTS: business@camptocamp.com
+      GPG_IMPORT_PUBLIC_KEYS: |
+          # Camptocamp Business Devs (Used for odoo-dumps) <business@camptocamp.com>
+          -----BEGIN PGP PUBLIC KEY BLOCK-----
+          Version: GnuPG v1
+
+          mQINBFmuUTwBEACSEyQ7Svz3HNBCMJVZ3sagrZRqvretrvn+txSmhKaFS7QZ0oc+
+          ....
+          =pula
+          -----END PGP PUBLIC KEY BLOCK-----
+          # Joe Bar (Used for odoo-dumps) <joe.bar@example.com>
+          -----BEGIN PGP PUBLIC KEY BLOCK-----
+          Version: GnuPG v1
+
+          mQMuBExgG+4RCACFRdLa8JRrLOZYOZXyHZ0dqAul/FcaI3K4NnBNs9iv14XKcwUt
+          ...
+          =JcEU
+          -----END PGP PUBLIC KEY BLOCK-----

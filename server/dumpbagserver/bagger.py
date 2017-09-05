@@ -5,6 +5,8 @@ import tempfile
 from contextlib import contextmanager
 from string import Template
 
+from flask import url_for
+
 from .database import DatabaseCommander, Database
 from .storage import StorageCommander
 from .encryption import EncryptionCommander
@@ -60,15 +62,24 @@ class Bagger():
     def read_dump(self, db, filename):
         return self.storage.read_dump(db, filename)
 
+    def public_keys(self):
+        return self.encrypter.public_keys()
+
     def download_commands(self, dbname, dump):
+
         lines = [
             "# Using wget",
-            "$$ wget $base_url/download/$dbname/$dump",
+            "$$ wget $url",
         ]
         params = {
-            'base_url': self.config.base_url,
             'dbname': dbname,
-            'dump': dump,
+            'filename': dump,
+            'url': url_for(
+                'download_dump',
+                db=dbname,
+                filename=dump,
+                _external=True,
+            ),
         }
         storage_command, storage_params = self.storage.download_commands(
             dbname, dump
@@ -78,6 +89,16 @@ class Bagger():
             lines += storage_command
         if storage_params:
             params.update(storage_params)
+
+        encrypter_dl_func = self.encrypter.download_commands
+        (encryption_command,
+            encryption_params) = encrypter_dl_func(dbname, dump)
+
+        if encryption_command:
+            lines.append('')
+            lines += encryption_command
+        if encryption_params:
+            params.update(encryption_params)
 
         tmpl = Template('\n'.join(lines))
         s = tmpl.substitute(**params)

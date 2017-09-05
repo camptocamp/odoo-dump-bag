@@ -62,6 +62,10 @@
               Databases
               <i class="material-icons">rowing</i>
             </a>
+            <a class="mdl-navigation__link {% if active_page == 'help' %} is-active {% endif %}" href="{{ url_for('help') }}">
+              Help
+              <i class="material-icons">help</i>
+            </a>
           </nav>
         </div>
       </header>
@@ -75,6 +79,10 @@
             <a class="mdl-navigation__link" href="{{ url_for('databases') }}">
               Databases
               <i class="material-icons">rowing</i>
+            </a>
+            <a class="mdl-navigation__link" href="{{ url_for('help') }}">
+              Help
+              <i class="material-icons">help</i>
             </a>
           </nav>
 

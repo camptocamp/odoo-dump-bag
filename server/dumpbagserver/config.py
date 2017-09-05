@@ -15,11 +15,14 @@ class FlaskConfig(object):
 class DumpBagConfig(object):
     """ Configuration """
 
-    base_url = env['BAG_BASE_URL']
     exclude_databases = env.get('BAG_EXCLUDE_DATABASE', '').split(',')
 
+    database_kind = env.get('BAG_DB_KIND', 'static')
+    storage_kind = env.get('BAG_STORAGE_KIND', 'local')
+    encryption_kind = env.get('BAG_ENCRYPTION_KIND', 'none')
+
     def database_options(self):
-        kind = env.get('BAG_DB_KIND', 'static')
+        kind = self.database_kind
         if kind == 'static':
             return StaticOptions()
         elif kind == 'postgres':
@@ -43,7 +46,7 @@ class DumpBagConfig(object):
             )
 
     def storage_options(self):
-        kind = env.get('BAG_STORAGE_KIND', 'local')
+        kind = self.storage_kind
         if kind == 'local':
             storage_dir = env.get('BAG_STORAGE_LOCAL_DIR')
             if not storage_dir:
@@ -73,7 +76,7 @@ class DumpBagConfig(object):
             )
 
     def encryption_options(self):
-        kind = env.get('BAG_ENCRYPTION_KIND', 'none')
+        kind = self.encryption_kind
         if kind == 'none':
             return NoOpEncryptionOptions()
         elif kind == 'gpg':

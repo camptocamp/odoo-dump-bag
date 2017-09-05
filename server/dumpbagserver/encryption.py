@@ -36,8 +36,14 @@ class EncryptionCommander():
             raise TypeError('No commander class set for these options')
         return klass(options)
 
+    def public_keys(self):
+        return ''
+
     def encrypt(self, directory, filename):
         raise NotImplementedError
+
+    def download_commands(self, dbname, filename):
+        return [], {}
 
 
 class NoOpEncryptionCommander(EncryptionCommander):
@@ -54,6 +60,19 @@ class NoOpEncryptionOptions():
 
 class GPGKeysCommander(EncryptionCommander):
     """ Commander for encryption with GPG Public/Private Keys """
+
+    def public_keys(self):
+        keys = []
+        for recipient in self.options.recipients:
+            command = [
+                'gpg', '--export', '-a', recipient
+            ]
+            proc = subprocess.Popen(
+                command, stdin=PIPE, stdout=PIPE, stderr=PIPE
+            )
+            stdout, stderr = proc.communicate()
+            keys.append(stdout.decode('utf8'))
+        return '\n'.join(keys)
 
     def encrypt(self, directory, filename):
         target = os.path.join(directory, filename)
@@ -73,6 +92,14 @@ class GPGKeysCommander(EncryptionCommander):
             )
             raise DumpEncryptionError(stderr.decode('utf8'))
         return "%s.gpg" % (filename,)
+
+    def download_commands(self, dbname, filename):
+        lines = [
+            "# decrypt with gpg, "
+            "you need to have the private key (on lastpass)",
+            "$$ gpg $filename",
+        ]
+        return lines, {}
 
 
 class GPGKeysOptions():

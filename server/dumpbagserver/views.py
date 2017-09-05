@@ -57,6 +57,27 @@ def download_dump(db, filename):
     return r
 
 
+@app.route('/help')
+def help():
+    has_gpg = app_config.encryption_kind == 'gpg'
+    gpg_recipients = (
+        app_config.encryption_options().recipients
+        if has_gpg else ''
+    )
+    has_s3 = app_config.storage_kind == 's3'
+    return render_template(
+        'help.html',
+        has_s3=has_s3,
+        has_gpg=has_gpg,
+        gpg_recipients=gpg_recipients,
+    )
+
+
+@app.route('/keys')
+def public_keys():
+    return Bagger(app_config).public_keys()
+
+
 @app.template_filter('date_from_dumpname')
 def date_from_dumpname(s):
     # extract 20170904-143345 from 'prod_template-20170904-143345.pg'

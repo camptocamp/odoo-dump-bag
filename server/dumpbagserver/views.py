@@ -35,12 +35,17 @@ def new_dump(dbname):
 
 @app.route('/dumpall')
 def dumpall():
+    # route used from curl / scheduler / cron
     Bagger(app_config).bag_all_databases()
     return ''
 
 
 @app.route('/has_dump_for_today/<string:dbname>')
 def has_dump_for_today(dbname):
+    """ Indicate if we already have a dump for today
+
+    Called with an ajax request from the 'databases' view
+    """
     return jsonify(Bagger(app_config).has_dump_for_today(dbname))
 
 
@@ -55,6 +60,8 @@ def download_dump(db, filename):
 @app.template_filter('date_from_dumpname')
 def date_from_dumpname(s):
     # extract 20170904-143345 from 'prod_template-20170904-143345.pg'
-    s_date = RE_DUMP_DATE.match(s).groups()[0]
-    converted = datetime.strptime(s_date, '%Y%m%d-%H%M%S')
+    s_date = RE_DUMP_DATE.match(s).groups()
+    if s_date is None:
+        return ''
+    converted = datetime.strptime(s_date[0], '%Y%m%d-%H%M%S')
     return converted.strftime('%Y-%m-%d %H:%M:%S')

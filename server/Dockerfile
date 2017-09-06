@@ -16,5 +16,8 @@ RUN pip install -e .
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
+ENV UWSGI_PROCESSES=4, \
+    UWSGI_THREADS=2
+
 EXPOSE 5000
-CMD ["uwsgi", "--http", "0.0.0.0:5000", "--wsgi-file", "/app/wsgi.py", "--processes", "4", "--threads", "2"]
+CMD uwsgi --http 0.0.0.0:5000 --wsgi-file /app/wsgi.py --processes $UWSGI_PROCESSES --threads $UWSGI_THREADS

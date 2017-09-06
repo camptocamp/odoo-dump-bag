@@ -1,5 +1,3 @@
-sudo: required
-
 services: docker
 
 env:
@@ -13,8 +11,12 @@ before_install:
   - if [ "$LINT_CHECK" == "1" ] ; then pip install --user -q flake8 ; fi
 
 install:
-  - if [ "$LINT_CHECK" == "0" ] ; then docker build server -t dumpbagserver ; fi
+  - if [ "$LINT_CHECK" == "0" ] ; then docker build server -t odoo-dump-bag-server ; fi
+  - if [ "$LINT_CHECK" == "0" ] ; then docker build nginx -t odoo-dump-bag-nginx ; fi
 
 script:
   - if [ "$LINT_CHECK" == "1" ] ; then flake8 server ; fi
-  - if [ "$TESTS" == "1" ] ; then docker run --rm dumpbagserver pytest tests ; fi
+  - if [ "$TESTS" == "1" ] ; then docker run --rm odoo-dump-bag-server pytest tests ; fi
+
+after_success:
+  - if [ "$TESTS" == "1" ] ; then ./travis/publish.sh ; fi

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/camptocamp/odoo-dump-bag.svg)](https://travis-ci.com/camptocamp/odoo-dump-bag)
+
 # Odoo Dump Bag
 
 https://jira.camptocamp.com/browse/BS-62

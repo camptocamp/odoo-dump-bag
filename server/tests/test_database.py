@@ -93,6 +93,8 @@ def test_postgres_list_database(mock_popen, postgres_commander):
     attrs = {'communicate.return_value': (command_stdout, b'')}
     process_mock.configure_mock(**attrs)
     mock_popen.return_value = process_mock
+    process_mock.returncode = 0
+
     dbs = postgres_commander.list_databases()
     assert dbs == ["template1", "template0", "postgres", "odoo", "odoodb",
                    "prod", "prod_template"]
@@ -104,5 +106,7 @@ def test_postgres_exec_dump(mock_popen, postgres_commander):
     attrs = {'communicate.return_value': (b'ok', b'')}
     process_mock.configure_mock(**attrs)
     mock_popen.return_value = process_mock
+    process_mock.returncode = 0
+
     postgres_commander.exec_dump('db1', '/tmp/test')
     assert mock_popen.called

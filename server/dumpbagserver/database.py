@@ -121,6 +121,7 @@ class PostgresDatabaseCommander(DatabaseCommander):
             _logger.error(
                 'error when creating dump:\n%s', stderr.decode('utf8')
             )
+            raise DumpingError(stderr.decode('utf8'))
 
 
 class PostgresOptions(DatabaseOptions):

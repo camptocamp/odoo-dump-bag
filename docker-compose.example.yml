@@ -49,3 +49,10 @@ services:
           ...
           =JcEU
           -----END PGP PUBLIC KEY BLOCK-----
+
+  scheduler:
+    image: blacklabelops/jobber:tools
+    environment:
+      JOB_NAME1: dumpall
+      JOB_COMMAND1: curl -v http://server:5000/dumpall
+      JOB_TIME1: "0 0 3 * * *"

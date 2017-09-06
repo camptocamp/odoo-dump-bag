@@ -10,7 +10,6 @@ services:
     volumes:
       - "./server/:/app/"
     environment:
-      FLASK_APP: dumpbagserver
       FLASK_SECRET_KEY: '\xa3u\xd3\xc1P;\x1a/R\x0f\x82\xd2v,}\xee\xa3\xf5\x90\xe7\xe1\x0e\xcd\xe3'
       FLASK_DEBUG: 'true'
       BAG_EXCLUDE_DATABASE: template0,template1,postgres

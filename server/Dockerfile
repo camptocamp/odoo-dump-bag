@@ -11,13 +11,14 @@ RUN set -x; \
     && apt-get install -y --no-install-recommends postgresql-client gnupg \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install uwsgi pytest pytest-runner mock awscli
+RUN pip install uwsgi pytest pytest-runner mock
 RUN pip install -e .
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 ENV UWSGI_PROCESSES=4, \
-    UWSGI_THREADS=2
+    UWSGI_THREADS=2, \
+    FLASK_APP=dumpbagserver
 
 EXPOSE 5000
 CMD uwsgi --http 0.0.0.0:5000 --wsgi-file /app/wsgi.py --processes $UWSGI_PROCESSES --threads $UWSGI_THREADS

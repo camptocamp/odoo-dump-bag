@@ -4,6 +4,71 @@
 
 https://jira.camptocamp.com/browse/BS-62
 
+## Pre-requisite
+
+The debian packages required are `postgresql-client`, `gnupg`. They are included in the Docker image.
+
+Test dependencies are: `pytest` and `mock`, which are installed in the Docker image too.
+
+## Configuration
+
+The server application is configured with environment variables:
+
+* `FLASK_SECRET_KEY`: must be unique and random (e.g. `os.urandom(24)`)
+* `FLASK_DEBUG`: set to true only for dev
+* `BAG_EXCLUDE_DATABASE`: database to exclude from the dumps, separated by commas. Recommended: `template0,template1,postgres`
+* `BAG_DB_KIND`: `static`/`postgres`
+* `BAG_STORAGE_KIND`: `local`/`s3`
+* `BAG_ENCRYPTION_KIND: `none`/`gpg`
+
+An example for docker-compose can be found in [docker-compose.example.yml](docker-compose.example.yml)
+
+### Configuration for DB
+
+#### static
+
+Only used for dev, instead of reading the list of databases from a PostgreSQL server, it returns a hardcoded list. The dumps are generated with dummy content.
+
+#### postgres
+
+It uses the `psql` and `pg_dump` commands to list the databases and generate the dumps. Variables:
+
+* `BAG_DB_HOST`: host of the PostgreSQL server
+* `BAG_DB_PORT`: port of the PostgreSQL server
+* `BAG_DB_USER`: user to use for database listing and dumps
+* `BAG_DB_PASSWORD`:  password for the user
+
+Dumps are created with the options `--format=c` and `--no-owner`.
+
+### Configuration for Storage
+
+#### local
+
+Dumps are stored in a local directory. Variables:
+
+* `BAG_STORAGE_LOCAL_DIR`: path to the directory to save the dumps
+
+#### s3
+
+It uses the `aws s3` and `aws s3api` commands to list and copy the files around. Variables:
+
+* `BAG_S3_BUCKET_NAME`: name of the S3 bucket
+* `BAG_S3_ACCESS_KEY`: access key for the S3 bucket
+* `BAG_S3_SECRET_ACCESS_KEY`: secret access key for the S3 bucket
+
+### Configuration for Encryption
+
+#### none
+
+Dumps are stored without encryption
+
+#### gpg
+
+It uses the `gpg` command. It encrypts the dumps for a list of recipients whose keys must be on the server. With the Docker image, the public keys can be imported with the environment variable `GPG_IMPORT_PUBLIC_KEYS`.
+
+Variables for the encryption:
+
+* `BAG_GPG_RECIPIENTS`: list of recipients separated by commas, only these recipients will be able to decrypt the dumps as long as they have the private key
 
 ## GPG Keys handling
 

@@ -39,7 +39,7 @@ class EncryptionCommander():
     def public_keys(self):
         return ''
 
-    def encrypt(self, directory, filename):
+    def encrypt(self, tmpdir, filename):
         raise NotImplementedError
 
     def download_commands(self, dbname, filename):
@@ -49,7 +49,7 @@ class EncryptionCommander():
 class NoOpEncryptionCommander(EncryptionCommander):
     """ Commander for no-op (no encryption) """
 
-    def encrypt(self, directory, filename):
+    def encrypt(self, tmpdir, filename):
         return filename
 
 
@@ -74,8 +74,8 @@ class GPGKeysCommander(EncryptionCommander):
             keys.append(stdout.decode('utf8'))
         return '\n'.join(keys)
 
-    def encrypt(self, directory, filename):
-        target = os.path.join(directory, filename)
+    def encrypt(self, tmpdir, filename):
+        target = os.path.join(tmpdir, filename)
         command = [
             'gpg', '--encrypt', '--always-trust',
         ]

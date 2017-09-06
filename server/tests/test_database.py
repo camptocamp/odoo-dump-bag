@@ -65,32 +65,32 @@ def test_list_database_exclude(db_with_exclude):
     assert dbs == ['db1', 'db2', 'db3']
 
 
-def test_dump_db_not_exist(db_with_exclude):
+def test_dump_db_not_exist(tmpdir, db_with_exclude):
     with pytest.raises(exception.DumpingError):
-        with db_with_exclude.create_temporary_dump_file('template0'):
-            pass
+        db_with_exclude.create_dump_file(tmpdir.strpath, 'template0')
 
 
-def test_dump(db_with_exclude):
-    with db_with_exclude.create_temporary_dump_file('db1') as dump:
-        assert os.path.exists(dump)
-        # file has been written (hardcoded for tests)
-        assert open(dump, 'r').read() == 'test db1'
+def test_dump(tmpdir, db_with_exclude):
+    dump = db_with_exclude.create_dump_file(tmpdir.strpath, 'db1')
+    target = tmpdir.join(dump).strpath
+    assert os.path.exists(target)
+    # file has been written (hardcoded for tests)
+    assert open(target, 'r').read() == 'test db1'
 
 
 @mock.patch('subprocess.Popen')
 def test_postgres_list_database(mock_popen, postgres_commander):
     process_mock = mock.Mock()
     command_stdout = (
-        "template1\n"
-        "template0\n"
-        "postgres\n"
-        "odoo\n"
-        "odoodb\n"
-        "prod\n"
-        "prod_template\n"
+        b"template1\n"
+        b"template0\n"
+        b"postgres\n"
+        b"odoo\n"
+        b"odoodb\n"
+        b"prod\n"
+        b"prod_template\n"
     )
-    attrs = {'communicate.return_value': (command_stdout, '')}
+    attrs = {'communicate.return_value': (command_stdout, b'')}
     process_mock.configure_mock(**attrs)
     mock_popen.return_value = process_mock
     dbs = postgres_commander.list_databases()
@@ -101,7 +101,7 @@ def test_postgres_list_database(mock_popen, postgres_commander):
 @mock.patch('subprocess.Popen')
 def test_postgres_exec_dump(mock_popen, postgres_commander):
     process_mock = mock.Mock()
-    attrs = {'communicate.return_value': ('ok', '')}
+    attrs = {'communicate.return_value': (b'ok', b'')}
     process_mock.configure_mock(**attrs)
     mock_popen.return_value = process_mock
     postgres_commander.exec_dump('db1', '/tmp/test')

@@ -17,9 +17,17 @@ class DumpBagConfig(object):
 
     exclude_databases = env.get('BAG_EXCLUDE_DATABASE', '').split(',')
 
-    database_kind = env.get('BAG_DB_KIND', 'static')
-    storage_kind = env.get('BAG_STORAGE_KIND', 'local')
-    encryption_kind = env.get('BAG_ENCRYPTION_KIND', 'none')
+    @property
+    def database_kind(self):
+        return env.get('BAG_DB_KIND', 'static')
+
+    @property
+    def storage_kind(self):
+        return env.get('BAG_STORAGE_KIND', 'local')
+
+    @property
+    def encryption_kind(self):
+        return env.get('BAG_ENCRYPTION_KIND', 'none')
 
     def database_options(self):
         kind = self.database_kind

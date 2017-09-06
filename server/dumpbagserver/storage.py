@@ -8,7 +8,6 @@ import os
 import shutil
 import subprocess
 import tempfile
-import time
 
 from contextlib import contextmanager
 from subprocess import PIPE
@@ -67,11 +66,6 @@ class StorageCommander():
     def download_commands(self, dbname, filename):
         return [], {}
 
-    def has_dump_for_today(self, dbname):
-        dumps = self.list_by_db().get(dbname, [])
-        start = '%s-%s' % (dbname, time.strftime("%Y%m%d"))
-        return any(filename.startswith(start) for filename in dumps)
-
 
 class LocalStorageCommander(StorageCommander):
     """ Commander used for tests only.
@@ -104,8 +98,8 @@ class LocalStorageCommander(StorageCommander):
         for (dirpath, __, filenames) in os.walk(storage_dir):
             for filename in filenames:
                 directory = os.path.basename(dirpath)
-                files.setdefault(directory, [])
-                files[directory].append(filename)
+                files.setdefault(directory, set())
+                files[directory].add(filename)
         return files
 
 

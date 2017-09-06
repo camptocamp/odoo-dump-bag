@@ -1,6 +1,7 @@
 import errno
 import shutil
 import tempfile
+import time
 
 from contextlib import contextmanager
 from string import Template
@@ -31,7 +32,9 @@ class Bagger():
         return self.db.list_databases()
 
     def has_dump_for_today(self, dbname):
-        return self.storage.has_dump_for_today(dbname)
+        dumps = self.storage.list_by_db().get(dbname, [])
+        start = '%s-%s' % (dbname, time.strftime("%Y%m%d"))
+        return any(filename.startswith(start) for filename in dumps)
 
     @contextmanager
     def temporary_working_dir(self):

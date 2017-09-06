@@ -151,12 +151,12 @@ class Database():
         now = time.strftime("%Y%m%d-%H%M%S")
         return '%s-%s.pg' % (dbname, now)
 
-    def create_dump_file(self, directory, dbname):
+    def create_dump_file(self, tmpdir, dbname):
         databases = self.list_databases()
         if dbname not in databases:
             raise DumpingError('Database %s does not exist or is excluded'
                                % (dbname,))
         name = self._generate_dump_name(dbname)
-        target = os.path.join(directory, name)
+        target = os.path.join(tmpdir, name)
         self.commander.exec_dump(dbname, target)
         return name

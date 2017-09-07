@@ -37,7 +37,10 @@ class EncryptionCommander():
         return klass(options)
 
     def public_keys(self):
-        return ''
+        return []
+
+    def recipients(self):
+        return []
 
     def encrypt(self, tmpdir, filename):
         raise NotImplementedError
@@ -63,7 +66,7 @@ class GPGKeysCommander(EncryptionCommander):
 
     def public_keys(self):
         keys = []
-        for recipient in self.options.recipients:
+        for recipient in self.recipients():
             command = [
                 'gpg', '--export', '-a', recipient
             ]
@@ -72,14 +75,17 @@ class GPGKeysCommander(EncryptionCommander):
             )
             stdout, stderr = proc.communicate()
             keys.append(stdout.decode('utf8'))
-        return '\n'.join(keys)
+        return keys
+
+    def recipients(self):
+        return self.options.recipients
 
     def encrypt(self, tmpdir, filename):
         target = os.path.join(tmpdir, filename)
         command = [
             'gpg', '--encrypt', '--always-trust',
         ]
-        for recipient in self.options.recipients:
+        for recipient in self.recipients():
             command += [
                 '--recipient', recipient,
             ]

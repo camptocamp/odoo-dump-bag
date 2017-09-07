@@ -63,7 +63,15 @@ def test_noop_encrypt(test_file, noop_commander):
 
 
 def test_noop_public_keys(noop_commander):
-    assert noop_commander.public_keys() == ''
+    assert noop_commander.public_keys() == []
+
+
+def test_noop_recipients(noop_commander):
+    assert noop_commander.recipients() == []
+
+
+def test_gpg_recipients(gpg_commander):
+    assert gpg_commander.recipients() == gpg_commander.options.recipients
 
 
 @mock.patch('subprocess.Popen')
@@ -90,7 +98,7 @@ def test_gpg_public_keys(mock_popen, gpg_commander):
     # as we have 2 recipients but the popen mock returns 2 times
     # the same key, the test assume we should receive 2 times the same key
     # in real world, each recipient will have the same key
-    assert public_keys == '\n'.join([keys, keys])
+    assert public_keys == [keys, keys]
     assert mock_popen.call_count == 2
     # the list of recipients is defined in gpg_options()
     assert mock_popen.call_args_list[0][0] == ([

@@ -95,11 +95,16 @@ http {
       uwsgi_pass {{ $bag_host }}:5000;
     }
 
-    location /keys {
-      # Allow to import public keys without messing with basic
-      # auth in wget / curl. Anyway public keys are public.
+    location ~ ^/(keys|recipients) {
+      # This one is open so other dump-bag servers can read the configuration
+      # from a central one. We configure only keys and recipients for the
+      # platform CH (dump-bag.odoo.camptocamp.ch) and the others will use the
+      # same ones.
+      # It also allow devs to use wget/curl on them without messing with basic auth
+      # Anyway public keys are public.
       uwsgi_pass {{ $bag_host }}:5000;
       auth_basic off;
+      allow all;
     }
 
     location /download {
@@ -110,10 +115,10 @@ http {
     }
 
     location ~* ^/static/ {
-        proxy_cache_valid 200 60m;
-        proxy_buffering on;
-        expires 864000;
-        uwsgi_pass {{ $bag_host }}:5000;
+      proxy_cache_valid 200 60m;
+      proxy_buffering on;
+      expires 864000;
+      uwsgi_pass {{ $bag_host }}:5000;
     }
 
   }

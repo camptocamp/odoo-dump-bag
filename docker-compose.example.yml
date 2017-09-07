@@ -48,6 +48,8 @@ services:
           ...
           =JcEU
           -----END PGP PUBLIC KEY BLOCK-----
+      # GPG_IMPORT_PUBLIC_KEYS_FROM_URL: http://somewhere/keys
+      # GPG_RECIPIENTS_FROM_URL: http://somewhere/recipients
 
   scheduler:
     image: blacklabelops/jobber:tools

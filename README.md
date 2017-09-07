@@ -70,6 +70,33 @@ Variables for the encryption:
 
 * `BAG_GPG_RECIPIENTS`: list of recipients separated by commas, only these recipients will be able to decrypt the dumps as long as they have the private key
 
+## Central configuration
+
+When using the Docker image, GPG public keys and recipients can be
+automatically configured from another dump bag server.
+
+Instead of `GPG_IMPORT_PUBLIC_KEYS` and `BAG_GPG_RECIPIENTS`,
+configure the keys:
+
+* `GPG_IMPORT_PUBLIC_KEYS_FROM_URL`: URL of another dump bag
+  server providing the public keys. The route is `/keys`:
+  http://dump-bag/keys
+* `GPG_RECIPIENTS_FROM_URL`: URL of another dump bag server
+  providing the list of recipients. The route is `/recipients`:
+  http://dump-bag/recipients
+
+Beware, this configuration is only read at the start of the container, so a
+change in the main configuration requires a restart. In the future, this could
+be checked regularly at runtime.
+
+If the Docker image could not be used, it could be done with an initialization script with this snippet:
+
+```
+curl -s http://dump-bag/keys | gpg --import
+BAG_GPG_RECIPIENTS=$(curl -s http://dump-bag/recipients)
+export BAG_GPG_RECIPIENTS
+```
+
 ## GPG Keys handling
 
 We share a GPG Private key for the internal developers of the department.

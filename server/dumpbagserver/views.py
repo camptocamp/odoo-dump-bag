@@ -75,7 +75,12 @@ def help():
 
 @app.route('/keys')
 def public_keys():
-    return Bagger(app_config).public_keys()
+    return '\n'.join(Bagger(app_config).public_keys())
+
+
+@app.route('/recipients')
+def recipients():
+    return ','.join(Bagger(app_config).recipients())
 
 
 @app.template_filter('date_from_dumpname')

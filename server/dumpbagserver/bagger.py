@@ -68,6 +68,9 @@ class Bagger():
     def public_keys(self):
         return self.encrypter.public_keys()
 
+    def recipients(self):
+        return self.encrypter.recipients()
+
     def download_commands(self, dbname, dump):
 
         lines = [

@@ -81,6 +81,7 @@
 
     function confirmNewDump(dbname) {
       showProgressBar('Dump in progress, please wait');
+      document.querySelector('.database-list').style.display = 'none';
       document.location.href = 'dump/' + dbname;
     }
 

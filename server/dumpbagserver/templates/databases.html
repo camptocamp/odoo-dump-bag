@@ -29,15 +29,10 @@
 
   <dialog class="mdl-dialog">
     <h4 class="mdl-dialog__title">Really create a new dump?</h4>
-    <div class="mdl-dialog__content">
-      <p>
-      There is already a dump for this database for today,
-      unless this is really needed, use the existing one. Thanks!
-      </p>
-    </div>
+    <div class="mdl-dialog__content"></div>
     <div class="mdl-dialog__actions">
-      <button type="button" class="mdl-button confirm">I'm sure I need a new dump</button>
-      <button type="button" class="mdl-button close">Got it, close.</button>
+      <button type="button" class="mdl-button confirm"></button>
+      <button type="button" class="mdl-button close"></button>
     </div>
   </dialog>
 
@@ -55,11 +50,7 @@
           if (xhr.status === OK) {
             var hasDump = JSON.parse(xhr.responseText);
             hideProgressBar();
-            if (hasDump) {
-              openDialog(dbname);
-            } else {
-              confirmNewDump(dbname);
-            }
+            openDialog(dbname, hasDump);
           } else {
             console.log('Error: ' + xhr.status); // An error occurred during the request.
           }
@@ -85,14 +76,48 @@
       document.location.href = 'dump/' + dbname;
     }
 
-    function openDialog(dbname) {
+    function openDialog(dbname, hasDump) {
       var confirm = dialog.querySelector('.confirm');
-      // clean previous event listeners by replacing the element
+      var close = dialog.querySelector('.close');
+
+      // clean previous event listeners by replacing the elements
       var newConfirm = confirm.cloneNode(true);
+      var newClose = close.cloneNode(true);
+
+      var content,
+          confirm_content,
+          cancel_content;
+      if (hasDump) {
+        content = '<p>' +
+                  'There is already a dump for ' + dbname + ' for today. ' +
+                  'Are you 100% sure that you really need a new one? ' +
+                  'I insist, check again in the list of dumps :)' +
+                  '</p>';
+        confirm_content = 'I\'ll be damned but yes please.';
+        cancel_content = 'Better show me the dumps then';
+      } else {
+        content = '<p>' +
+                  'The database ' + dbname + ' has no dump today, ' +
+                  'but maybe yesterday? ' +
+                  'Can you check if you really need a new one?' +
+                  '</p>';
+        confirm_content = 'Yes, I need a new one';
+        cancel_content = 'Got it, show me the dumps';
+      }
+      dialog.querySelector('.mdl-dialog__content').innerHTML = content;
+      newConfirm.innerHTML = confirm_content;
+      newClose.innerHTML = cancel_content;
+
       confirm.parentNode.replaceChild(newConfirm, confirm);
+      close.parentNode.replaceChild(newClose, close);
+
       newConfirm.addEventListener('click', function() {
         dialog.close()
         confirmNewDump(dbname);
+      });
+      newClose.addEventListener('click', function() {
+        dialog.close()
+        document.location.href = '/#' + dbname;
       });
       dialog.showModal();
     }
@@ -103,9 +128,6 @@
       if (! dialog.showModal) {
         dialogPolyfill.registerDialog(dialog);
       }
-      dialog.querySelector('.close').addEventListener('click', function() {
-        dialog.close();
-      });
       return dialog;
     }
     dialog = setupDialog();

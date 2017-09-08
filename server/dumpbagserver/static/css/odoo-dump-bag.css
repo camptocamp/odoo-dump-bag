@@ -1,45 +1,50 @@
-.card-group.mdl-card {
-  width: 256px;
-  height: 256px;
-  float: left;
-  clear: left;
-  margin: 1rem;
+.database-list {
+  margin: auto;
+}
+
+.dumps h2, h3 {
+  margin: 10px;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.dump-title {
+  cursor: pointer;
+}
+
+.dump-list li span {
+  text-transform: none;
 }
 
 
-.card-composition.mdl-card {
-  width: 256px;
-  height: 256px;
-  float: left;
-  margin: 1rem;
+.dumpinfo-box {
+  margin-left: 20px;
 }
 
-.card-composition.mdl-card:hover {
-  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2);
+.mdl-navigation__link{
+  position: relative;
+
 }
 
-.card-composition > .mdl-card__title {
-  background: #009688;
-}
-.card-composition > .mdl-card__title > h6 {
-  /* margin-top: 0; */
-}
-.card-composition > .mdl-card__actions {
-  /* display: flex; */
-  box-sizing:border-box;
-  align-items: center;
-}
-.card-composition > .mdl-card__title {
-  color: #fff;
+.mdl-navigation__link.is-active:after {
+  position: absolute;
+  content: '';
+  border-bottom: 4px solid #fff;
+  width: 70%;
+  transform: translateX(-50%);
+  bottom: 0px;
+  left: 50%;
 }
 
-.card-composition > .mdl-card__actions .mdl-button {
-  min-width: 40px;
-  padding: 0 8px;
-}
 
-.card-composition > .mdl-tooltip > ul {
-  list-style-type: none;
-  text-align: left;
-  padding: 5px;
+.databases .progress {
+  width: 100%;
+}
+.databases .progress .bar {
+  width: 100%;
+  height: 12px;
+}
+.databases .progress .progress-caption {
+  width: 100%;
+  text-align: center;
 }

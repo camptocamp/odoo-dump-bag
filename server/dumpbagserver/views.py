@@ -1,16 +1,93 @@
 # Copyright 2017 Camptocamp SA
 # License GPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
+import re
+from datetime import datetime
 
-from dumpbagserver import app
-from flask import Flask, render_template, redirect, url_for, request, flash
+from dumpbagserver import app, app_config
+from flask import render_template, redirect, url_for, flash, jsonify
+
+from .bagger import Bagger
+
+RE_DUMP_DATE = re.compile(r'.*(\d{8}-\d{6}).*')
+
+
+@app.route('/databases')
+def databases():
+    databases = Bagger(app_config).list_databases()
+    return render_template('databases.html', databases=databases)
 
 
 @app.route('/')
-def databases():
-    return render_template('databases.html')
-
-
-@app.route('/dumps')
 def dumps():
-    return render_template('dumps.html')
+    bagger = Bagger(app_config)
+    dumps = bagger.list_dumps()
+    return render_template('dumps.html', dumps=dumps,
+                           download_commands=bagger.download_commands)
+
+
+@app.route('/dump/<string:dbname>')
+def new_dump(dbname):
+    filename = Bagger(app_config).bag_one_database(dbname)
+    flash('dump {} has been pushed with filename {}'.format(dbname, filename))
+    return redirect(url_for('dumps', _anchor=dbname))
+
+
+@app.route('/dumpall')
+def dumpall():
+    # route used from curl / scheduler / cron
+    Bagger(app_config).bag_all_databases()
+    return ''
+
+
+@app.route('/has_dump_for_today/<string:dbname>')
+def has_dump_for_today(dbname):
+    """ Indicate if we already have a dump for today
+
+    Called with an ajax request from the 'databases' view
+    """
+    return jsonify(Bagger(app_config).has_dump_for_today(dbname))
+
+
+@app.route('/download/<string:db>/<string:filename>')
+def download_dump(db, filename):
+    dump = Bagger(app_config).read_dump(db, filename)
+    r = app.response_class(dump, mimetype='application/octet-stream')
+    r.headers.set('Content-Disposition', 'attachment', filename=filename)
+    return r
+
+
+@app.route('/help')
+def help():
+    has_gpg = app_config.encryption_kind == 'gpg'
+    gpg_recipients = (
+        app_config.encryption_options().recipients
+        if has_gpg else ''
+    )
+    has_s3 = app_config.storage_kind == 's3'
+    return render_template(
+        'help.html',
+        has_s3=has_s3,
+        has_gpg=has_gpg,
+        gpg_recipients=gpg_recipients,
+    )
+
+
+@app.route('/keys')
+def public_keys():
+    return '\n'.join(Bagger(app_config).public_keys())
+
+
+@app.route('/recipients')
+def recipients():
+    return ','.join(Bagger(app_config).recipients())
+
+
+@app.template_filter('date_from_dumpname')
+def date_from_dumpname(s):
+    # extract 20170904-143345 from 'prod_template-20170904-143345.pg'
+    s_date = RE_DUMP_DATE.match(s).groups()
+    if s_date is None:
+        return ''
+    converted = datetime.strptime(s_date[0], '%Y%m%d-%H%M%S')
+    return converted.strftime('%Y-%m-%d %H:%M:%S')

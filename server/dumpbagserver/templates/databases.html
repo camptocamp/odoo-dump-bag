@@ -1,9 +1,137 @@
 {% extends "layout.html" %}
+{% set active_page = "databases" %}
 {% block body %}
 
-<div md>
+<div class="databases">
 
-  Databases
+  <div class="progress" style="display: none;">
+    <div id="progress-bar"
+      class="mdl-progress mdl-js-progress mdl-progress__indeterminate bar">
+    </div>
+    <div class="progress-caption"></div>
+  </div>
+
+  <ul class="mdl-list database-list">
+    {% for dbname in databases | sort %}
+    <li class="mdl-list__item">
+      <span class="mdl-list__item-primary-content">
+        <a
+          title="Push dump to storage"
+          class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
+          onclick="askNewDump('{{dbname}}')"
+          >
+          Create dump for {{dbname}} and push it!
+        </a>
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <dialog class="mdl-dialog">
+    <h4 class="mdl-dialog__title">Really create a new dump?</h4>
+    <div class="mdl-dialog__content"></div>
+    <div class="mdl-dialog__actions">
+      <button type="button" class="mdl-button confirm"></button>
+      <button type="button" class="mdl-button close"></button>
+    </div>
+  </dialog>
+
+  <script>
+    var dialog;
+    function askNewDump(dbname) {
+      showProgressBar('Checking...');
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'has_dump_for_today/' + dbname);
+      xhr.send(null);
+      xhr.onreadystatechange = function () {
+        var DONE = 4; // readyState 4 means the request is done.
+        var OK = 200; // status 200 is a successful return.
+        if (xhr.readyState === DONE) {
+          if (xhr.status === OK) {
+            var hasDump = JSON.parse(xhr.responseText);
+            hideProgressBar();
+            openDialog(dbname, hasDump);
+          } else {
+            console.log('Error: ' + xhr.status); // An error occurred during the request.
+          }
+        }
+      };
+    }
+
+    function showProgressBar(caption) {
+      var progress = document.querySelector('.progress');
+      progress.style.display = 'block';
+      progress.querySelector('.progress-caption').innerHTML = caption;
+    }
+
+    function hideProgressBar() {
+      var progress = document.querySelector('.progress');
+      progress.style.display = 'none';
+      progress.querySelector('.progress-caption').innerHTML = '';
+    }
+
+    function confirmNewDump(dbname) {
+      showProgressBar('Dump in progress, please wait');
+      document.querySelector('.database-list').style.display = 'none';
+      document.location.href = 'dump/' + dbname;
+    }
+
+    function openDialog(dbname, hasDump) {
+      var confirm = dialog.querySelector('.confirm');
+      var close = dialog.querySelector('.close');
+
+      // clean previous event listeners by replacing the elements
+      var newConfirm = confirm.cloneNode(true);
+      var newClose = close.cloneNode(true);
+
+      var content,
+          confirm_content,
+          cancel_content;
+      if (hasDump) {
+        content = '<p>' +
+                  'There is already a dump for ' + dbname + ' for today. ' +
+                  'Are you 100% sure that you really need a new one? ' +
+                  'I insist, check again in the list of dumps :)' +
+                  '</p>';
+        confirm_content = 'I\'ll be damned but yes please.';
+        cancel_content = 'Better show me the dumps then';
+      } else {
+        content = '<p>' +
+                  'The database ' + dbname + ' has no dump today, ' +
+                  'but maybe yesterday? ' +
+                  'Can you check if you really need a new one?' +
+                  '</p>';
+        confirm_content = 'Yes, I need a new one';
+        cancel_content = 'Got it, show me the dumps';
+      }
+      dialog.querySelector('.mdl-dialog__content').innerHTML = content;
+      newConfirm.innerHTML = confirm_content;
+      newClose.innerHTML = cancel_content;
+
+      confirm.parentNode.replaceChild(newConfirm, confirm);
+      close.parentNode.replaceChild(newClose, close);
+
+      newConfirm.addEventListener('click', function() {
+        dialog.close()
+        confirmNewDump(dbname);
+      });
+      newClose.addEventListener('click', function() {
+        dialog.close()
+        document.location.href = '/#' + dbname;
+      });
+      dialog.showModal();
+    }
+
+    function setupDialog(dbname) {
+      var dialog = document.querySelector('dialog');
+      var showDialogButton = document.querySelector('#show-dialog');
+      if (! dialog.showModal) {
+        dialogPolyfill.registerDialog(dialog);
+      }
+      return dialog;
+    }
+    dialog = setupDialog();
+  </script>
 
 </div>
 {% endblock %}

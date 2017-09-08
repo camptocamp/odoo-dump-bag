@@ -1,9 +1,70 @@
 {% extends "layout.html" %}
+{% set active_page = "dumps" %}
 {% block body %}
 
-<div md>
+<div class="dumps">
 
-  Dumps
+  {% for database, dumps in dumps | dictsort %}
+    <h2 class="dump-title" onclick="toggleGroup('dump-list-for-{{database}}', '{{database}}')">
+      <a name="{{database}}"></a>{{database}}
+    </h2>
+
+    <ul class="mdl-list dump-list" id="dump-list-for-{{database}}"
+      style="display: none">
+    {% for dump in dumps | sort(reverse=True) %}
+    <li class="mdl-list__item-two-line">
+      <span
+        onclick="toggleVisibility('dumpinfo-box-{{dump}}')"
+        class="mdl-list__item-primary-content mdl-button mdl-js-button">
+        {{dump}}
+      </span>
+      <span class="mdl-list__item-secondary-content">
+        {{ dump | date_from_dumpname }} UTC
+      </span>
+      <span id="dumpinfo-box-{{dump}}" class="mdl-list__item-secondary-content dumpinfo-box" style="display: none">
+        <strong>Commands</strong>
+        <pre>{{download_commands(database, dump)}}</pre>
+        <a
+          title="Download {{dump}}"
+          class="mdl-button mdl-js-button mdl-button--colored mdl-button--raised mdl-js-ripple-effect"
+          href="{{ url_for('download_dump', db=database, filename=dump) }}"
+          >
+          Download
+        </a>
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+
+  <script>
+
+  function toggleGroup(groupId, database) {
+    var groups = document.querySelectorAll('.dump-list');
+    var idx;
+    for (idx = 0; idx < groups.length; idx++) {
+      if (groups[idx].id !== groupId) {
+        groups[idx].style.display = 'none';
+      }
+    }
+    toggleVisibility(groupId);
+    // change the url to the db group
+    if(history.pushState) {
+      // on modern browser, change the anchor hash
+      // without moving the page to the anchor
+      history.pushState(null, null, '#' + database);
+    } else {
+      // fallback, it will move the window to the anchor
+      location.hash = '#' + database;
+    }
+  }
+
+  var hash = window.location.hash.substr(1);
+  if (hash) {
+    toggleVisibility('dump-list-for-' + hash);
+  }
+
+  </script>
 
 </div>
 {% endblock %}

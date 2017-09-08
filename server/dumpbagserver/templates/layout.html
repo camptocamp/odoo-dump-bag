@@ -3,8 +3,11 @@
   <head>
     <title>Dump Bag</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/material.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dialog-polyfill.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/odoo-dump-bag.css') }}">
     <script src="{{ url_for('static', filename='js/material.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dialog-polyfill.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <script>
@@ -40,24 +43,50 @@
       color: white;
     }
     </style>
+    {% set active_page = active_page | default('dumps') %}
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
+          <div class="mdl-layout-icon"></div>
           <!-- Title -->
           <span class="mdl-layout-title">Dump Bag</span>
           <!-- Add spacer, to align navigation to the right -->
           <div class="mdl-layout-spacer"></div>
           <!-- Navigation. We hide it in small screens. -->
           <nav class="mdl-navigation mdl-layout--large-screen-only">
-            <a class="mdl-navigation__link" href="{{ url_for('databases') }}">
-              <i class="material-icons">code</i>
+            <a class="mdl-navigation__link {% if active_page == 'dumps' %} is-active {% endif %}" href="{{ url_for('dumps') }}">
+              Dumps
+              <i class="material-icons">storage</i>
             </a>
-            <a class="mdl-navigation__link" href="{{ url_for('dumps') }}">
-              <i class="material-icons">code</i>
+            <a class="mdl-navigation__link {% if active_page == 'databases' %} is-active {% endif %}" href="{{ url_for('databases') }}">
+              Databases
+              <i class="material-icons">rowing</i>
+            </a>
+            <a class="mdl-navigation__link {% if active_page == 'help' %} is-active {% endif %}" href="{{ url_for('help') }}">
+              Help
+              <i class="material-icons">help</i>
             </a>
           </nav>
         </div>
       </header>
+     <div class="mdl-layout__drawer mdl-layout--small-screen-only">
+          <span class="mdl-layout-title">Dump Bag</span>
+          <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="{{ url_for('dumps') }}">
+              Dumps
+              <i class="material-icons">storage</i>
+            </a>
+            <a class="mdl-navigation__link" href="{{ url_for('databases') }}">
+              Databases
+              <i class="material-icons">rowing</i>
+            </a>
+            <a class="mdl-navigation__link" href="{{ url_for('help') }}">
+              Help
+              <i class="material-icons">help</i>
+            </a>
+          </nav>
+
+      </div>
       <main class="mdl-layout__content">
         <div id="snackbar-flash" class="mdl-js-snackbar mdl-snackbar">
           <div class="mdl-snackbar__text"></div>
@@ -65,14 +94,6 @@
         </div>
         {% block body %}{% endblock %}
       </main>
-      <footer class="mdl-mini-footer">
-        <div class="mdl-mini-footer__left-section">
-          <div class="mdl-logo">Dump Bag</div>
-          <ul class="mdl-mini-footer__link-list">
-            <li><a href="#">Help</a></li>
-          </ul>
-        </div>
-      </footer>
     </div>
   </body>
 </html>

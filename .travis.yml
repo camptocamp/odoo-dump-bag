@@ -19,4 +19,4 @@ script:
   - if [ "$TESTS" == "1" ] ; then docker run --rm odoo-dump-bag-server pytest tests ; fi
 
 after_success:
-  - if [ "$TESTS" == "1" ] ; then ./travis/publish.sh ; fi
+  - if [ "$TESTS" == "1" ] ; then ./publish.sh ; fi

@@ -51,6 +51,19 @@ services:
       # GPG_IMPORT_PUBLIC_KEYS_FROM_URL: http://somewhere/keys
       # GPG_RECIPIENTS_FROM_URL: http://somewhere/recipients
 
+  nginx:
+    build: ./nginx/
+    environment:
+      NGX_BAG_HOST: server
+      NGX_HTTP_ACCESS: |-
+        satisfy any;
+        allow 172.21.0.0/32;
+        deny all;
+      NGX_HTPASSWD: |-
+        odoo:${BASIC_AUTH_PASSWORD}
+    links:
+      - server:server
+
   scheduler:
     image: blacklabelops/jobber:tools
     environment:

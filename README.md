@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/camptocamp/odoo-dump-bag.svg)](https://travis-ci.com/camptocamp/odoo-dump-bag)
+[![Build Status](https://travis-ci.com/camptocamp/odoo-dump-bag.svg?token=3A3ZhwttEcmdqp7JzQb7&branch=master)](https://travis-ci.com/camptocamp/odoo-dump-bag)
 
 # Odoo Dump Bag
 

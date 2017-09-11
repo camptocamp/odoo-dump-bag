@@ -87,7 +87,7 @@ http {
 
     include /etc/nginx/http-access.conf;
     {{ if getenv "NGX_HTPASSWD" }}
-    auth_basic "test";
+    auth_basic "Odoo Dump Bags";
     auth_basic_user_file /etc/nginx/htpasswd;
     {{ end }}
 

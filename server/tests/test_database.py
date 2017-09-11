@@ -39,6 +39,13 @@ def db_with_exclude(commander):
     )
 
 
+@pytest.fixture
+def db_with_only(commander):
+    return database.Database(
+        commander, only=['db1', 'db2']
+    )
+
+
 def test_commander_factory(static_options, postgres_options):
     cmd = database.DatabaseCommander.new_commander(
         static_options
@@ -63,6 +70,11 @@ def test_list_database_exclude(db_with_exclude):
     db_with_exclude.exclude = ['postgres', 'template0', 'template1']
     dbs = db_with_exclude.list_databases()
     assert dbs == ['db1', 'db2', 'db3']
+
+
+def test_list_database_only(db_with_only):
+    dbs = db_with_only.list_databases()
+    assert dbs == ['db1', 'db2']
 
 
 def test_dump_db_not_exist(tmpdir, db_with_exclude):

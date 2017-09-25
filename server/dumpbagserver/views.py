@@ -86,8 +86,8 @@ def recipients():
 @app.template_filter('date_from_dumpname')
 def date_from_dumpname(s):
     # extract 20170904-143345 from 'prod_template-20170904-143345.pg'
-    s_date = RE_DUMP_DATE.match(s).groups()
-    if s_date is None:
+    match = RE_DUMP_DATE.match(s)
+    if match is None:
         return ''
-    converted = datetime.strptime(s_date[0], '%Y%m%d-%H%M%S')
+    converted = datetime.strptime(match.groups()[0], '%Y%m%d-%H%M%S')
     return converted.strftime('%Y-%m-%d %H:%M:%S')

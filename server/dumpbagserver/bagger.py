@@ -20,7 +20,11 @@ class Bagger():
         db_commander = DatabaseCommander.new_commander(
             self.config.database_options()
         )
-        self.db = Database(db_commander, exclude=self.config.exclude_databases)
+        self.db = Database(
+            db_commander,
+            only=config.only_databases,
+            exclude=self.config.exclude_databases
+        )
         self.storage = StorageCommander.new_commander(
             self.config.storage_options()
         )

@@ -15,7 +15,15 @@ class FlaskConfig(object):
 class DumpBagConfig(object):
     """ Configuration """
 
-    exclude_databases = env.get('BAG_EXCLUDE_DATABASE', '').split(',')
+    @property
+    def only_databases(self):
+        only = env.get('BAG_ONLY_DATABASE', '').strip()
+        return only.split(',') if only else []
+
+    @property
+    def exclude_databases(self):
+        exclude = env.get('BAG_EXCLUDE_DATABASE', '').strip()
+        return exclude.split(',') if exclude else []
 
     @property
     def database_kind(self):

@@ -84,7 +84,7 @@ class PostgresDatabaseCommander(DatabaseCommander):
         command = [
             'psql',
             '--host', self.options.host,
-            '--port', self.options.port,
+            '--port', str(self.options.port),
             '--username', self.options.user,
             '--quiet', '--no-align', '--tuples-only',
             '--dbname', 'postgres',
@@ -128,7 +128,7 @@ class PostgresOptions(DatabaseOptions):
     """ Options for the PostgreSQL commander """
     _commander = PostgresDatabaseCommander
 
-    def __init__(self, host, user, password, port=5432):
+    def __init__(self, host, user, password, port='5432'):
         self.host = host
         self.port = port
         self.user = user
@@ -137,15 +137,17 @@ class PostgresOptions(DatabaseOptions):
 
 class Database():
 
-    def __init__(self, commander, exclude=None):
+    def __init__(self, commander, only=None, exclude=None):
+        self.only = only
         self.exclude = exclude
         self.commander = commander
 
     def list_databases(self):
         databases = self.commander.list_databases()
+        if self.only:
+            databases = [db for db in databases if db in self.only]
         if self.exclude:
-            databases = [db for db in databases
-                         if db not in self.exclude]
+            databases = [db for db in databases if db not in self.exclude]
         return databases
 
     def _generate_dump_name(self, dbname):

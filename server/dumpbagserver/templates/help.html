@@ -83,7 +83,7 @@ $ curl {{url_for('public_keys', _external=True)}} | gpg --import
 $ gpg --encrypt{% for recipient in gpg_recipients %} --recipient {{recipient}}{% endfor %} fighting_snail_1024-20170904-092333.pg
 $ aws --profile=odoo-dumps s3 fighting_snail_1024-20170904-092333.pg.gpg cp s3://odoo-dumps/fighting_snail_1024/fighting_snail_1024-20170904-092333.pg.gpg
           {% else%}
-$ aws --profile=odoo-dumps s3 fighting_snail_1024-20170904-092333.pg cp s3://odoo-dumps/fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% endif %}</pre>
+$ aws --profile=odoo-dumps s3 cp fighting_snail_1024-20170904-092333.pg s3://odoo-dumps/fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% endif %}</pre>
         </div>
       </li>
       {% endif %}

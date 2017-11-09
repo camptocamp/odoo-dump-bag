@@ -44,7 +44,7 @@ http {
   proxy_redirect          off;
   proxy_connect_timeout   90;
   proxy_send_timeout      90;
-  proxy_read_timeout      1h;
+  proxy_read_timeout      3h;
   proxy_buffers           32 4k;
   proxy_buffer_size       8k;
   proxy_set_header         Host $http_host;
@@ -108,6 +108,13 @@ http {
     }
 
     location /download {
+      proxy_read_timeout      8h;
+      uwsgi_read_timeout      8h;
+
+      client_max_body_size 10G;
+      proxy_max_temp_file_size 10240M;
+      uwsgi_max_temp_file_size 10240M;
+
       # Allow download from wget... we still have an ip restriction.
       # See if we want to change that... Dumps are encrypted anyway.
       uwsgi_pass {{ $bag_host }}:5000;

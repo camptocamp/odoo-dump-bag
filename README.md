@@ -4,6 +4,12 @@
 
 https://jira.camptocamp.com/browse/BS-62
 
+## Docker Images
+Docker Images are push to https://hub.docker.com/r/camptocamp/odoo-dump-bag-server/ as:
+
+* camptocamp/odoo-dump-bag-server:latest
+* camptocamp/odoo-dump-bag-server:nginx
+
 ## Pre-requisite
 
 The debian packages required are `postgresql-client`, `gnupg`. They are included in the Docker image.

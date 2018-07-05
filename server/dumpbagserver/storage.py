@@ -137,11 +137,30 @@ class S3StorageCommander(StorageCommander):
         return stdout, stderr
 
     def push_to_storage(self, dbname, source_path, filename):
+        key = "%s/%s" % (dbname, filename)
+        self._push_object(source_path, filename, key)
+        self._add_expire_tag(key)
+        _logger.info('pushed dump %s to S3', filename)
+
+    def _push_object(self, source_path, filename, key):
         source = os.path.join(source_path, filename)
-        target = "s3://%s/%s/%s" % (self.options.bucket, dbname, filename)
+        target = "s3://%s/%s" % (self.options.bucket, key)
         command = ['aws', 's3', 'cp', source, target]
         self._exec_s3_cmd(command)
-        _logger.info('pushed dump %s to S3', filename)
+
+    def _add_expire_tag(self, key):
+        """Add an Expire=True tag on the pushed object
+
+        We set a tag so we can configure a rule on S3 to automatically remove
+        the dumps after some time
+        """
+        tagging = "TagSet=[{Key=Expire,Value=True}]"
+        command = ['aws', 's3api', 'put-object-tagging',
+                   '--bucket', self.options.bucket,
+                   '--key', key,
+                   '--tagging', tagging,
+                   ]
+        self._exec_s3_cmd(command)
 
     @contextmanager
     def read_from_storage(self, dbname, filename):

@@ -69,11 +69,12 @@
           Rules for pushing a dump on S3:
           <ul>
             <li>S3 write access is required, the key is stored in LastPass</li>
-            <li>Name convention for the dump: &lt;database_name&gt;-YYMMDD-HHMMSS.pg{% if has_gpg %}.gpg{% endif %}</li>
+            <li>Name convention for the dump: <strong>&lt;database_name&gt;-YYMMDD-HHMMSS.pg{% if has_gpg %}.gpg{% endif %}</strong>. Having the full date is important.</li>
             <li>Tree structure: dumps are placed in a folder which is the name of the database</li>
             {% if has_gpg %}
             <li>The dumps <strong>must be encrypted</strong> with gpg</li>
             <li>The command below contains the correct list of gpg --recipient to use for the encryption</li>
+            <li>You <strong>must set the expiration tagging</strong> otherwise the dump will stay indefinitely, unless you really need to keep a dump. Not putting the tag must the exception, not the rule</li>
             {% endif %}
           </ul>
 
@@ -81,9 +82,10 @@
           <pre>{% if has_gpg %}
 $ curl {{url_for('public_keys', _external=True)}} | gpg --import
 $ gpg --encrypt{% for recipient in gpg_recipients %} --recipient {{recipient}}{% endfor %} fighting_snail_1024-20170904-092333.pg
-$ aws --profile=odoo-dumps s3 cp fighting_snail_1024-20170904-092333.pg.gpg s3://odoo-dumps/fighting_snail_1024/fighting_snail_1024-20170904-092333.pg.gpg
-          {% else%}
-$ aws --profile=odoo-dumps s3 cp fighting_snail_1024-20170904-092333.pg s3://odoo-dumps/fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% endif %}</pre>
+{% endif %}
+$ aws --profile=odoo-dumps s3 cp fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %} s3://odoo-dumps/fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %}
+$ aws --profile=odoo-dumps s3api put-object-tagging --bucket odoo-dumps --key fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %} --tagging="TagSet=[{Key=Expire,Value=True}]"
+          </pre>
         </div>
       </li>
       {% endif %}

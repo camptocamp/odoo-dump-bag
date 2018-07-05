@@ -3,3 +3,4 @@
 .cache
 .eggs
 docker-compose.yml
+.pytest_cache/

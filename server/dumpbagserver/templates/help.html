@@ -69,7 +69,7 @@
           Rules for pushing a dump on S3:
           <ul>
             <li>S3 write access is required, the key is stored in LastPass</li>
-            <li>Name convention for the dump: <strong>&lt;database_name&gt;-YYMMDD-HHMMSS.pg{% if has_gpg %}.gpg{% endif %}</strong>. Having the full date is important.</li>
+            <li>Name convention for the dump: <strong>&lt;database_name&gt;-YYMMDD-HHMMSS.pg{% if has_gpg %}.gpg{% endif %}</strong>. Having the full date is required.</li>
             <li>Tree structure: dumps are placed in a folder which is the name of the database</li>
             {% if has_gpg %}
             <li>The dumps <strong>must be encrypted</strong> with gpg</li>
@@ -79,10 +79,10 @@
           </ul>
 
           Commands
-          <pre>{% if has_gpg %}
+          <pre>{% if has_gpg -%}
 $ curl {{url_for('public_keys', _external=True)}} | gpg --import
 $ gpg --encrypt{% for recipient in gpg_recipients %} --recipient {{recipient}}{% endfor %} fighting_snail_1024-20170904-092333.pg
-{% endif %}
+{%- endif %}
 $ aws --profile=odoo-dumps s3 cp fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %} s3://odoo-dumps/fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %}
 $ aws --profile=odoo-dumps s3api put-object-tagging --bucket odoo-dumps --key fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %} --tagging="TagSet=[{Key=Expire,Value=True}]"
           </pre>

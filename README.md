@@ -18,6 +18,33 @@ Test dependencies are: `pytest` and `mock`, which are installed in the Docker im
 
 ## Configuration
 
+Dev and run tests.
+
+In the `server` directory, install a virtual environment with:
+
+```
+pipenv --python 3.5
+pipenv install
+```
+
+Run tests with:
+
+```
+pipenv shell
+python setup.py test
+# or
+py.test tests
+```
+
+For running flask, use the composition:
+
+```
+docker-compose up
+# or a run command
+```
+
+## Configuration
+
 The server application is configured with environment variables:
 
 * `FLASK_SECRET_KEY`: must be unique and random (e.g. `os.urandom(24)`)

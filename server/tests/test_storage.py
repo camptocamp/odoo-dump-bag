@@ -36,6 +36,27 @@ def test_file(tmpdir):
     return tmpdir.strpath, filename
 
 
+def configure_mock_popen(mock_popen, attrs, returncode):
+    process_mock = mock.Mock()
+    process_mock.configure_mock(**attrs)
+    mock_popen.return_value = process_mock
+    process_mock.returncode = 0
+    return mock_popen
+
+
+def assert_s3_env_access(mock_popen, commander):
+    __tracebackhide__ = True
+    process_env = mock_popen.call_args[1]['env']
+
+    if process_env['AWS_ACCESS_KEY_ID'] != commander.options.access_key:
+        pytest.fail('AWS_ACCESS_KEY_ID is not in the S3 process environment')
+
+    secret = commander.options.secret_access_key
+    if process_env['AWS_SECRET_ACCESS_KEY'] != secret:
+        pytest.fail('AWS_SECRET_ACCESS_KEY is not in '
+                    'the S3 process environment')
+
+
 def test_commander_factory(local_options, s3_options):
     cmd = storage.StorageCommander.new_commander(local_options)
     assert type(cmd) is storage.LocalStorageCommander
@@ -84,24 +105,54 @@ def test_local_list_by_db(tmpdir, local_commander):
 
 @mock.patch('subprocess.Popen')
 def test_s3_push(mock_popen, test_file, s3_commander):
-    process_mock = mock.Mock()
-    attrs = {'communicate.return_value': (b'', b'')}
-    process_mock.configure_mock(**attrs)
-    mock_popen.return_value = process_mock
-    process_mock.returncode = 0
+    mock_popen = configure_mock_popen(
+        mock_popen,
+        {'communicate.return_value': (b'', b'')},
+        0
+    )
+
+    tmpdir, filename = test_file
+    s3_commander.push_to_storage('db1', tmpdir, filename)
+    assert mock_popen.call_count == 2
+    assert_s3_env_access(mock_popen, s3_commander)
+
+
+@mock.patch('subprocess.Popen')
+def test_s3_push_object(mock_popen, test_file, s3_commander):
+    mock_popen = configure_mock_popen(
+        mock_popen,
+        {'communicate.return_value': (b'', b'')},
+        0
+    )
 
     tmpdir, filename = test_file
     source = os.path.join(tmpdir, filename)
-    s3_commander.push_to_storage('db1', tmpdir, filename)
+    s3_commander._push_object(tmpdir, filename, 'db1/' + filename)
     assert mock_popen.call_count == 1
     url = 's3://%s/%s/%s' % (s3_commander.options.bucket, 'db1', filename)
     assert mock_popen.call_args[0] == ([
         'aws', 's3', 'cp', source, url
     ],)
-    process_env = mock_popen.call_args[1]['env']
-    assert process_env['AWS_ACCESS_KEY_ID'] == s3_commander.options.access_key
-    secret = s3_commander.options.secret_access_key
-    assert process_env['AWS_SECRET_ACCESS_KEY'] == secret
+    assert_s3_env_access(mock_popen, s3_commander)
+
+
+@mock.patch('subprocess.Popen')
+def test_s3_add_expire_tag(mock_popen, test_file, s3_commander):
+    mock_popen = configure_mock_popen(
+        mock_popen,
+        {'communicate.return_value': (b'', b'')},
+        0
+    )
+
+    s3_commander._add_expire_tag('db1/foo')
+    assert mock_popen.call_count == 1
+    expected_tag = "TagSet=[{Key=Expire,Value=True}]"
+    assert mock_popen.call_args[0] == ([
+        'aws', 's3api', 'put-object-tagging',
+        '--bucket', s3_commander.options.bucket,
+        '--key', 'db1/foo', '--tagging', expected_tag
+    ],)
+    assert_s3_env_access(mock_popen, s3_commander)
 
 
 @mock.patch('subprocess.Popen')
@@ -135,16 +186,12 @@ def test_s3_read_from_storage(mock_mkdtemp, mock_popen, tmpdir, s3_commander):
     assert mock_popen.call_args[0] == ([
         'aws', 's3', 'cp', url, tmpfile
     ],)
-    process_env = mock_popen.call_args[1]['env']
-    assert process_env['AWS_ACCESS_KEY_ID'] == s3_commander.options.access_key
-    secret = s3_commander.options.secret_access_key
-    assert process_env['AWS_SECRET_ACCESS_KEY'] == secret
+    assert_s3_env_access(mock_popen, s3_commander)
 
 
 @mock.patch('subprocess.Popen')
 def test_s3_list_by_db(mock_popen, s3_commander):
-    process_mock = mock.Mock()
-    process_mock.communicate.return_value = (
+    communicate_return = (
         # stdout
         b'['
         b'"README",'
@@ -158,8 +205,11 @@ def test_s3_list_by_db(mock_popen, s3_commander):
         # stderr
         b''
     )
-    mock_popen.return_value = process_mock
-    process_mock.returncode = 0
+    mock_popen = configure_mock_popen(
+        mock_popen,
+        {'communicate.return_value': communicate_return},
+        0
+    )
 
     dumps = s3_commander.list_by_db()
     assert dumps == {
@@ -174,7 +224,4 @@ def test_s3_list_by_db(mock_popen, s3_commander):
         'aws', 's3api', 'list-objects-v2', '--bucket',
         s3_commander.options.bucket, '--query', 'Contents[].Key'
     ],)
-    process_env = mock_popen.call_args[1]['env']
-    assert process_env['AWS_ACCESS_KEY_ID'] == s3_commander.options.access_key
-    secret = s3_commander.options.secret_access_key
-    assert process_env['AWS_SECRET_ACCESS_KEY'] == secret
+    assert_s3_env_access(mock_popen, s3_commander)

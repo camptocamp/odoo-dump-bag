@@ -57,6 +57,21 @@ def download_dump(db, filename):
     return r
 
 
+@app.route('/nightly')
+def get_nightlies():
+    """ Return a JSON object with the list of S3 URIs
+        for each dump of the current day
+    """
+    today = datetime.today().strftime('%Y%m%d')
+    storage = Bagger(app_config).storage
+    db_list = storage.list_by_db()
+    return jsonify([
+        storage.download_commands(k, v[-1])[1]['s3_url']
+        for k, v in db_list.items()
+        if today in v[-1]
+    ])
+
+
 @app.route('/help')
 def help():
     has_gpg = app_config.encryption_kind == 'gpg'

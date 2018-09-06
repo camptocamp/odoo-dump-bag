@@ -75,7 +75,14 @@
             {% if has_gpg %}
             <li>The dumps <strong>must be encrypted</strong> with gpg</li>
             <li>The command below contains the correct list of gpg --recipient to use for the encryption</li>
-            <li>You <strong>must set the expiration tagging</strong> otherwise the dump will stay indefinitely, unless you really need to keep a dump. Not putting the tag must the exception, not the rule</li>
+            <li>You <strong>must set the expiration tagging</strong> otherwise the dump will stay indefinitely, unless you really need to keep a dump. Not putting the tag must be the exception, not the rule</li>
+            <li>Available expiration tags are :
+              <ul>
+                <li>Expire : 30 days</li>
+                <li>ShortExpire : 7 days</li>
+              </ul>
+            </li>
+            <li>Always prefer to use ShortExpire key for manually pushed dumps as Expire is used for automatically generated ones.</li>
             {% endif %}
           </ul>
 
@@ -85,7 +92,7 @@ $ curl {{url_for('public_keys', _external=True)}} | gpg --import
 $ gpg --encrypt{% for recipient in gpg_recipients %} --recipient {{recipient}}{% endfor %} fighting_snail_1024-20170904-092333.pg
 {%- endif %}
 $ aws --profile=odoo-dumps s3 cp fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %} s3://odoo-dumps/fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %}
-$ aws --profile=odoo-dumps s3api put-object-tagging --bucket odoo-dumps --key fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %} --tagging="TagSet=[{Key=Expire,Value=True}]"
+$ aws --profile=odoo-dumps s3api put-object-tagging --bucket odoo-dumps --key fighting_snail_1024/fighting_snail_1024-20170904-092333.pg{% if has_gpg %}.gpg{% endif %} --tagging="TagSet=[{Key=ShortExpire,Value=True}]"
           </pre>
         </div>
       </li>

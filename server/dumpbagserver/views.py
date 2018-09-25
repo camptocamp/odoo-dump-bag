@@ -89,7 +89,9 @@ def get_nightlies():
 def dumps_for(db):
     bagger = Bagger(app_config)
     dumps = bagger.list_dumps(dbname=db).get(db, [])
-    return jsonify(dumps)
+    return jsonify([
+        "%s/%s" % (db, dump) for dump in dumps
+    ])
 
 
 @app.route('/help')

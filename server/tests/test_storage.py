@@ -87,7 +87,7 @@ def test_local_read(tmpdir, local_commander):
         assert content.read() == b'line1\nline2\nline3'
 
 
-def test_local_list_by_db(tmpdir, local_commander):
+def _create_empty_files(tmpdir, local_commander):
     # create empty files so we can check if the tree is returned correctly
     for db in ('db1', 'db2', 'db3'):
         os.makedirs(os.path.join(tmpdir.strpath, db))
@@ -95,11 +95,23 @@ def test_local_list_by_db(tmpdir, local_commander):
             source = os.path.join(tmpdir.strpath, db, 'dump%s.pg' % (idx,))
             with open(source, 'wb'):
                 pass
+
+
+def test_local_list_by_db(tmpdir, local_commander):
+    _create_empty_files(tmpdir, local_commander)
     tree = local_commander.list_by_db()
     assert tree == {
         'db1': {'dump0.pg', 'dump1.pg', 'dump2.pg'},
         'db2': {'dump0.pg', 'dump1.pg', 'dump2.pg'},
         'db3': {'dump0.pg', 'dump1.pg', 'dump2.pg'},
+    }
+
+
+def test_local_list_by_db_filter(tmpdir, local_commander):
+    _create_empty_files(tmpdir, local_commander)
+    tree = local_commander.list_by_db(dbname='db2')
+    assert tree == {
+        'db2': {'dump0.pg', 'dump1.pg', 'dump2.pg'},
     }
 
 
@@ -223,5 +235,39 @@ def test_s3_list_by_db(mock_popen, s3_commander):
     assert mock_popen.call_args[0] == ([
         'aws', 's3api', 'list-objects-v2', '--bucket',
         s3_commander.options.bucket, '--query', 'Contents[].Key'
+    ],)
+    assert_s3_env_access(mock_popen, s3_commander)
+
+
+@mock.patch('subprocess.Popen')
+def test_s3_list_by_db_filter(mock_popen, s3_commander):
+    communicate_return = (
+        # stdout
+        b'['
+        b'"db2/db1-20170904-094333.pg",'
+        b'"db2/db1-20170904-094500.pg",'
+        b'"db2/db2-20170904-110917.pg"'
+        b']',
+        # stderr
+        b''
+    )
+    mock_popen = configure_mock_popen(
+        mock_popen,
+        {'communicate.return_value': communicate_return},
+        0
+    )
+
+    dumps = s3_commander.list_by_db(dbname='db2')
+    assert dumps == {
+        'db2': ['db1-20170904-094333.pg',
+                'db1-20170904-094500.pg',
+                'db2-20170904-110917.pg'],
+        }
+
+    assert mock_popen.call_count == 1
+    assert mock_popen.call_args[0] == ([
+        'aws', 's3api', 'list-objects-v2', '--bucket',
+        s3_commander.options.bucket, '--query', 'Contents[].Key',
+        '--prefix', 'db2/'
     ],)
     assert_s3_env_access(mock_popen, s3_commander)

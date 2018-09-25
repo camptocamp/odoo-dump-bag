@@ -6,8 +6,21 @@ from datetime import datetime
 
 from dumpbagserver import app, app_config
 from flask import render_template, redirect, url_for, flash, jsonify
+from werkzeug.routing import UnicodeConverter, ValidationError
 
 from .bagger import Bagger
+
+
+class DBNameConverter(UnicodeConverter):
+
+    def to_python(self, value):
+        if not re.match("^[A-Za-z0-9_-]+$", value):
+            raise ValidationError()
+        return value
+
+
+app.url_map.converters['dbname'] = DBNameConverter
+
 
 RE_DUMP_DATE = re.compile(r'.*(\d{8}-\d{6}).*')
 
@@ -26,7 +39,7 @@ def dumps():
                            download_commands=bagger.download_commands)
 
 
-@app.route('/dump/<string:dbname>')
+@app.route('/dump/<dbname:dbname>')
 def new_dump(dbname):
     filename = Bagger(app_config).bag_one_database(dbname)
     flash('dump {} has been pushed with filename {}'.format(dbname, filename))
@@ -40,7 +53,7 @@ def dumpall():
     return ''
 
 
-@app.route('/has_dump_for_today/<string:dbname>')
+@app.route('/has_dump_for_today/<dbname:dbname>')
 def has_dump_for_today(dbname):
     """ Indicate if we already have a dump for today
 
@@ -49,7 +62,7 @@ def has_dump_for_today(dbname):
     return jsonify(Bagger(app_config).has_dump_for_today(dbname))
 
 
-@app.route('/download/<string:db>/<string:filename>')
+@app.route('/download/<dbname:db>/<string:filename>')
 def download_dump(db, filename):
     dump = Bagger(app_config).read_dump(db, filename)
     r = app.response_class(dump, mimetype='application/octet-stream')
@@ -57,7 +70,7 @@ def download_dump(db, filename):
     return r
 
 
-@app.route('/nightly')
+@app.route('/api/nightly')
 def get_nightlies():
     """ Return a JSON object with the list of S3 URIs
         for each dump of the current day
@@ -70,6 +83,13 @@ def get_nightlies():
         for k, v in db_list.items()
         if today in v[-1]
     ])
+
+
+@app.route('/api/dumps/<dbname:db>')
+def dumps_for(db):
+    bagger = Bagger(app_config)
+    dumps = bagger.list_dumps(dbname=db).get(db, [])
+    return jsonify(dumps)
 
 
 @app.route('/help')

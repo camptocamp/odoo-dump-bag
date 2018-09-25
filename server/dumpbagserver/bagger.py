@@ -63,8 +63,8 @@ class Bagger():
         for dbname in self.list_databases():
             self.bag_one_database(dbname)
 
-    def list_dumps(self):
-        return self.storage.list_by_db()
+    def list_dumps(self, dbname=None):
+        return self.storage.list_by_db(dbname=dbname)
 
     def read_dump(self, db, filename):
         return self.storage.read_dump(db, filename)

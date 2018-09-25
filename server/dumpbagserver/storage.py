@@ -51,10 +51,11 @@ class StorageCommander():
         """
         raise NotImplementedError
 
-    def list_by_db(self):
+    def list_by_db(self, dbname=None):
         """ Return a dict with files path/url
 
-        dictionary {dbname: [list of files]}
+        :param dbname: name of a dbname to filter
+        :return: dictionary {dbname: [list of files]}
         """
         raise NotImplementedError
 
@@ -92,12 +93,14 @@ class LocalStorageCommander(StorageCommander):
         with open(fullpath, 'rb') as f:
             yield f
 
-    def list_by_db(self):
+    def list_by_db(self, dbname=None):
         files = {}
         storage_dir = self.options.storage_dir
         for (dirpath, __, filenames) in os.walk(storage_dir):
+            directory = os.path.basename(dirpath)
+            if dbname and dbname != directory:
+                continue
             for filename in filenames:
-                directory = os.path.basename(dirpath)
                 files.setdefault(directory, set())
                 files[directory].add(filename)
         return files
@@ -184,17 +187,20 @@ class S3StorageCommander(StorageCommander):
                 if err.errno != errno.ENOENT:  # file does not exist
                     raise
 
-    def list_by_db(self):
+    def list_by_db(self, dbname=None):
         """ Return a dict with files path/url
 
-        dictionary {dbname: [list of files]}
+        :param dbname: name of a dbname to filter
+        :return: dictionary {dbname: [list of files]}
         """
         command = ['aws', 's3api', 'list-objects-v2',
                    '--bucket', self.options.bucket,
                    '--query', 'Contents[].Key']
+        if dbname:
+            command += ['--prefix', dbname + '/']
         stdout, _stderr = self._exec_s3_cmd(command)
         files = {}
-        for line in json.loads(stdout.decode('utf8')):
+        for line in json.loads(stdout.decode('utf8')) or []:
             spl = line.split('/')
             if len(spl) != 2:
                 continue

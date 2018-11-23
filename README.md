@@ -2,7 +2,9 @@
 
 # Odoo Dump Bag
 
-https://jira.camptocamp.com/browse/BS-62
+This is about to set up a system which allows generate to dumps of production
+databases on-demand and the developers to retrieve those dumps with aminimal
+impact on the network and VPN for the users of company network.
 
 ## Docker Images
 Docker Images are push to https://hub.docker.com/r/camptocamp/odoo-dump-bag-server/ as:

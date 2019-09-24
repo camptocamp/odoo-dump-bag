@@ -6,7 +6,7 @@ WORKDIR /app
 
 RUN set -x; \
     apt update \
-    && apt install -y --no-install-recommends postgresql-client-9.6 gnupg \
+    && apt install -y --no-install-recommends postgresql-client-11 gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install uwsgi pytest pytest-runner mock

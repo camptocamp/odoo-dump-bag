@@ -2,9 +2,12 @@
 
 # Odoo Dump Bag
 
-This is about to set up a system which allows generate to dumps of production
-databases on-demand and the developers to retrieve those dumps with aminimal
-impact on the network and VPN for the users of company network.
+A service to provide database dumps from your PostgreSQL server, when you want from the web interface.
+
+* The web interface shows a list of dumps from an object storage or file system, with curl / aws s3 commands.
+* The web interface shows the list of databases in the cluster and allow to generate a new dump in one click.
+* New dumps are encrypted with a GPG key and pushed to the object storage or file system.
+* An optional scheduler service to generate dumps nightly.
 
 ## Docker Images
 Docker Images are push to https://hub.docker.com/r/camptocamp/odoo-dump-bag-server/ as:

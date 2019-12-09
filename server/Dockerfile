@@ -5,8 +5,10 @@ COPY . /app
 WORKDIR /app
 
 RUN set -x; \
-    apt update \
-    && apt install -y --no-install-recommends postgresql-client-11 gnupg \
+    curl -s https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && apt update \
+    && apt install -y --no-install-recommends postgresql-client gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install uwsgi pytest pytest-runner mock

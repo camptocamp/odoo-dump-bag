@@ -50,6 +50,14 @@
           <div class="mdl-layout-icon"></div>
           <!-- Title -->
           <span class="mdl-layout-title">Dump Bag</span>
+          <form id="search-form" class="col s12" method="GET" role="search">
+            <div class="row">
+              <div class="form-group input-field col s8">
+                    {{ form.search(class="form-control form-control-lg") }}
+                      <button type="submit" class="button-search" id="search-button"><i class="material-icons prefix">search</i></button>
+              </div>
+            </div>
+          </form>
           <!-- Add spacer, to align navigation to the right -->
           <div class="mdl-layout-spacer"></div>
           <!-- Navigation. We hide it in small screens. -->
@@ -92,6 +100,17 @@
           <div class="mdl-snackbar__text"></div>
           <button class="mdl-snackbar__action" type="button"></button>
         </div>
+        <form class="col s12" method="GET" role="search">
+          <div class="row">
+             {% if form.search.errors %}
+                       {% for error in form.search.errors %}
+                       <div class="form-group alert invalid-feedback col s8">
+                         <span class="glyphicon glyphicon-warning-sign form-control-feedback" >{{ error }}</span>
+                       </div>
+                       {% endfor %}
+               {% endif %}
+          </div>
+         </form>
         {% block body %}{% endblock %}
       </main>
     </div>

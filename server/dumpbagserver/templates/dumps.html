@@ -2,40 +2,94 @@
 {% set active_page = "dumps" %}
 {% block body %}
 
-<div class="dumps">
+<div class="dumps container">
+  <form id="search" class="col s12" method="POST" role="search">
+    <div class="row">
+        {% if form.search.errors %}
+        <div class="form-group input-field col s8">
+              {{ form.search(class="form-control form-control-lg") }}
+                <button type="submit" class="button-search"><i class="material-icons prefix">search</i></button>
+                </div>
+                  {% for error in form.search.errors %}
+                  <div class="form-group alert invalid-feedback col s8">
+                    <span class="glyphicon glyphicon-warning-sign form-control-feedback" >{{ error }}</span>
+                  </div>
+                  {% endfor %}
+          {% else %}
+          <div class="form-group input-field col s8">
+              {{ form.search(class="form-control form-control-lg") }}
+                <button type="submit" class="button-search"><i class="material-icons prefix">search</i></button>
+          </div>
+          {% endif %}
+        </div>
+  </form>
 
-  {% for database, dumps in dumps | dictsort %}
-    <h2 class="dump-title" onclick="toggleGroup('dump-list-for-{{database}}', '{{database}}')">
-      <a name="{{database}}"></a>{{database}}
-    </h2>
+{% if result is defined %}
+  {% for database, dumps in result | dictsort %}
+     <h2 class="dump-title" onclick="toggleGroup('dump-list-for-{{database}}', '{{database}}')">
+           <a name="{{database}}"></a>{{database}}
+         </h2>     <ul class="mdl-list dump-list" id="dump-list-for-{{database}}"
+           style="display: none">
 
-    <ul class="mdl-list dump-list" id="dump-list-for-{{database}}"
-      style="display: none">
-    {% for dump in dumps | sort(reverse=True) %}
-    <li class="mdl-list__item-two-line">
-      <span
-        onclick="toggleVisibility('dumpinfo-box-{{dump}}')"
-        class="mdl-list__item-primary-content mdl-button mdl-js-button">
-        {{dump}}
-      </span>
-      <span class="mdl-list__item-secondary-content">
-        {{ dump | date_from_dumpname }} UTC
-      </span>
-      <span id="dumpinfo-box-{{dump}}" class="mdl-list__item-secondary-content dumpinfo-box" style="display: none">
-        <strong>Commands</strong>
-        <pre>{{download_commands(database, dump)}}</pre>
-        <a
-          title="Download {{dump}}"
-          class="mdl-button mdl-js-button mdl-button--colored mdl-button--raised mdl-js-ripple-effect"
-          href="{{ url_for('download_dump', db=database, filename=dump) }}"
-          >
-          Download
-        </a>
-      </span>
-    </li>
-    {% endfor %}
-  </ul>
-  {% endfor %}
+         {% for dump in dumps | sort(reverse=True) %}
+         <li class="mdl-list__item-two-line">
+           <span
+             onclick="toggleVisibility('dumpinfo-box-{{dump}}')"
+             class="mdl-list__item-primary-content mdl-button mdl-js-button">
+             {{dump}}
+           </span>
+           <span class="mdl-list__item-secondary-content">
+             {{ dump | date_from_dumpname }} UTC
+           </span>
+           <span id="dumpinfo-box-{{dump}}" class="mdl-list__item-secondary-content dumpinfo-box" style="display: none">
+             <strong>Commands</strong>
+             <pre>{{download_commands(database, dump)}}</pre>
+             <a
+               title="Download {{dump}}"
+               class="mdl-button mdl-js-button mdl-button--colored mdl-button--raised mdl-js-ripple-effect"
+               href="{{ url_for('download_dump', db=database, filename=dump) }}"
+               >
+               Download
+             </a>
+           </span>
+         </li>
+         {% endfor %}
+       </ul>
+   {% endfor %}
+   {% else %}
+        {% for database, dumps in dumps | dictsort %}
+          <hr class="dump-list-divider">
+             <h2 class="dump-title" onclick="toggleGroup('dump-list-for-{{database}}', '{{database}}')">
+               <a name="{{database}}"></a>{{database}}
+             </h2>  <ul class="mdl-list dump-list" id="dump-list-for-{{database}}"
+               style="display: none">
+             {% for dump in dumps | sort(reverse=True) %}
+             <li class="mdl-list__item-two-line">
+               <span
+                 onclick="toggleVisibility('dumpinfo-box-{{dump}}')"
+                 class="mdl-list__item-primary-content mdl-button mdl-js-button">
+                 {{dump}}
+               </span>
+               <span class="mdl-list__item-secondary-content">
+                 {{ dump | date_from_dumpname }} UTC
+               </span>
+               <span id="dumpinfo-box-{{dump}}" class="mdl-list__item-secondary-content dumpinfo-box" style="display: none">
+                 <strong>Commands</strong>
+                 <pre>{{download_commands(database, dump)}}</pre>
+                 <a
+                   title="Download {{dump}}"
+                   class="mdl-button mdl-js-button mdl-button--colored mdl-button--raised mdl-js-ripple-effect"
+                   href="{{ url_for('download_dump', db=database, filename=dump) }}"
+                   >
+                   Download
+                 </a>
+               </span>
+             </li>
+
+             {% endfor %}
+           </ul>
+           {% endfor %}
+{% endif %}
 
   <script>
 
@@ -68,4 +122,3 @@
 
 </div>
 {% endblock %}
-

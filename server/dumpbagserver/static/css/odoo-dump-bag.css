@@ -1,3 +1,21 @@
+body{
+background-color:  #eceff1;
+}
+
+.dumps{
+margin-left: 20%;
+margin-right: 20%;
+}
+
+.navbar-form{
+margin-left: 10%;
+height: 30%;
+}
+
+.form-group{
+  padding: 2em;
+}
+
 .database-list {
   margin: auto;
 }
@@ -16,14 +34,23 @@
   text-transform: none;
 }
 
-
 .dumpinfo-box {
   margin-left: 20px;
 }
 
 .mdl-navigation__link{
   position: relative;
+ font-size: large;
+ margin-top: 1.5em;
+}
 
+.mdl-layout__header-row .mdl-navigation__link{
+  color: grey !important;
+  font-size: : large !important;
+}
+
+.material-icons{
+  color: #708bac;
 }
 
 .mdl-navigation__link.is-active:after {
@@ -34,17 +61,58 @@
   transform: translateX(-50%);
   bottom: 0px;
   left: 50%;
+  color: #708bac;
 }
-
 
 .databases .progress {
   width: 100%;
 }
+
 .databases .progress .bar {
   width: 100%;
   height: 12px;
 }
+
 .databases .progress .progress-caption {
   width: 100%;
   text-align: center;
+}
+
+.layout-transparent {
+  background: url('{{ url_for('static', filename='img/transparent.jpg') }}') center / cover;
+}
+
+.layout-transparent .mdl-layout__header,
+.layout-transparent .mdl-layout__drawer-button {
+  /* This background is dark, so we set text to white. Use 87% black instead if
+     your background is light. */
+  color: white;
+}
+
+.mdl-layout__header{
+ height: 6.5em;
+ background-color: white;
+}
+
+.logo-camp-to-camp{
+margin-top: 1.5em;
+}
+
+input#search{
+  width: 70%;
+  height: 2em;
+  margin-right: 1em;
+}
+
+.form-group{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.invalid-feedback{
+padding: 0;
+color: #d32f2f;
+background-color: #ef9a9a;
+justify-content: center;
 }

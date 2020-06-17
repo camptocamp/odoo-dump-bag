@@ -31,25 +31,19 @@
     </script>
   </head>
   <body>
-    <!-- Uses a transparent header that draws on top of the layout's background -->
-    <style>
-    .layout-transparent {
-      background: url('{{ url_for('static', filename='img/transparent.jpg') }}') center / cover;
-    }
-    .layout-transparent .mdl-layout__header,
-    .layout-transparent .mdl-layout__drawer-button {
-      /* This background is dark, so we set text to white. Use 87% black instead if
-         your background is light. */
-      color: white;
-    }
-    </style>
+  
     {% set active_page = active_page | default('dumps') %}
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
-          <div class="mdl-layout-icon"></div>
+          <div class="mdl-layout-icon " >
+                <img src={{ url_for('static', filename='img/logo.svg') }} class="logo-camp-to-camp"></div>
+                <div class="mdl-layout-spacer"></div>
+              <!-- Title -->
+              <!-- <span class="mdl-layout-title">Dump Bag</span> -->
+              <!-- Add spacer, to align navigation to the right -->
+              <div class="mdl-layout-spacer"></div>
           <!-- Title -->
-          <span class="mdl-layout-title">Dump Bag</span>
           <!-- Add spacer, to align navigation to the right -->
           <div class="mdl-layout-spacer"></div>
           <!-- Navigation. We hide it in small screens. -->

@@ -7362,7 +7362,7 @@ input.mdl-button[type="submit"] {
   box-sizing: border-box; }
 
 .mdl-navigation__link {
-  color: rgb(66,66,66);
+  color: rgba(255, 0, 0, 0.5);
   text-decoration: none;
   margin: 0;
   font-size: 14px;
@@ -7408,7 +7408,8 @@ input.mdl-button[type="submit"] {
   line-height: 1;
   letter-spacing: 0.02em;
   font-weight: 400;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  }
 
 .mdl-layout-spacer {
   -webkit-flex-grow: 1;
@@ -7560,7 +7561,7 @@ input.mdl-button[type="submit"] {
   max-height: 1000px;
   z-index: 3;
   background-color: rgb(63,81,181);
-  color: rgb(255,255,255);
+  color:white;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   transition-duration: 0.2s;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

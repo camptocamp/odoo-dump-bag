@@ -1,44 +1,44 @@
 {% extends "layout.html" %}
 {% set active_page = "dumps" %}
 {% block body %}
-
 <div class="dumps">
-
+  {% if not dumps %}
+    <h4>No dump found!</h4>
+  {% endif %}
   {% for database, dumps in dumps | dictsort %}
-    <h2 class="dump-title" onclick="toggleGroup('dump-list-for-{{database}}', '{{database}}')">
-      <a name="{{database}}"></a>{{database}}
-    </h2>
+     <h2 class="dump-title" onclick="toggleGroup('dump-list-for-{{database}}', '{{database}}')">
+           <a name="{{database}}" ></a>{{database}}
+         </h2> <ul class="mdl-list dump-list" id="dump-list-for-{{database}}" >
+         {% for dump in dumps | sort(reverse=True) %}
+         <li class="mdl-list__item-two-line">
+           <span  onclick="toggleVisibility('dumpinfo-box-{{dump}}')" class="mdl-list__item-primary-content mdl-button mdl-js-button">
+             {{dump}}
+           </span>
+           <span class="mdl-list__item-secondary-content">
+             {{ dump | date_from_dumpname }} UTC
+           </span>
+           <span id="dumpinfo-box-{{dump}}" class="mdl-list__item-secondary-content dumpinfo-box">
+             <strong>Commands</strong>
+             <pre>{{download_commands(database, dump)}}</pre>
+             <a
+               title="Download {{dump}}"
+               class="mdl-button mdl-js-button mdl-button--colored mdl-button--raised mdl-js-ripple-effect"
+               href="{{ url_for('download_dump', db=database, filename=dump) }}"
+               >
+               Download
+             </a>
+           </span>
+         </li>
+         {% endfor %}
+       </ul>
+   {% endfor %}
 
-    <ul class="mdl-list dump-list" id="dump-list-for-{{database}}"
-      style="display: none">
-    {% for dump in dumps | sort(reverse=True) %}
-    <li class="mdl-list__item-two-line">
-      <span
-        onclick="toggleVisibility('dumpinfo-box-{{dump}}')"
-        class="mdl-list__item-primary-content mdl-button mdl-js-button">
-        {{dump}}
-      </span>
-      <span class="mdl-list__item-secondary-content">
-        {{ dump | date_from_dumpname }} UTC
-      </span>
-      <span id="dumpinfo-box-{{dump}}" class="mdl-list__item-secondary-content dumpinfo-box" style="display: none">
-        <strong>Commands</strong>
-        <pre>{{download_commands(database, dump)}}</pre>
-        <a
-          title="Download {{dump}}"
-          class="mdl-button mdl-js-button mdl-button--colored mdl-button--raised mdl-js-ripple-effect"
-          href="{{ url_for('download_dump', db=database, filename=dump) }}"
-          >
-          Download
-        </a>
-      </span>
-    </li>
-    {% endfor %}
-  </ul>
-  {% endfor %}
 
   <script>
-
+  /*
+   * show/hide database dumps
+  */
+  document.getElementById('search-button').style.display = 'none';
   function toggleGroup(groupId, database) {
     var groups = document.querySelectorAll('.dump-list');
     var idx;
@@ -58,14 +58,43 @@
       location.hash = '#' + database;
     }
   }
-
+  function hideAll() {
+    var groups = document.getElementsByClassName('dump-list');
+    [].forEach.call(groups, function(group){
+      group.style.display = 'none';
+    });
+    var commands = document.getElementsByClassName('dumpinfo-box');
+    [].forEach.call(commands, function(command){
+      command.style.display = 'none';
+    });
+  }
+  hideAll();
   var hash = window.location.hash.substr(1);
   if (hash) {
     toggleVisibility('dump-list-for-' + hash);
   }
+  function search (text) {
+      var dumplist = document.querySelectorAll('.dump-list');
+      [].forEach.call(dumplist, function(ul){
+          var title = ul.previousElementSibling;
+          title.style.display = 'none';
+          ul.style.display = 'none';
+          var items = ul.getElementsByTagName('li');
+          for (var i = 0; i < items.length; i++) {
+              var name = items[i].getElementsByTagName('span')[0].innerHTML;
+              if (name.toUpperCase().indexOf(text.toUpperCase()) >= 0){
+                  title.style.display = '';
+                  break;
+              }
+          }
+      });
+  }
+  var input = document.getElementById('search');
+  input.onkeyup = function() {
+    search(input.value);
+}
 
   </script>
 
 </div>
 {% endblock %}
-

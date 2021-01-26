@@ -12,11 +12,12 @@ events {
 
 http {
   include /etc/nginx/mime.types;
+  include /etc/nginx/http-access.conf;
   default_type  application/octet-stream;
 
   sendfile on;
 
-  server_tokens on;
+  server_tokens off;
 
   types_hash_max_size 1024;
   types_hash_bucket_size 512;
@@ -85,7 +86,6 @@ http {
 
     add_header              Strict-Transport-Security "max-age=31536000";
 
-    include /etc/nginx/http-access.conf;
     {{ if getenv "NGX_HTPASSWD" }}
     auth_basic "Odoo Dump Bags";
     auth_basic_user_file /etc/nginx/htpasswd;
@@ -93,6 +93,11 @@ http {
 
     location / {
       uwsgi_pass {{ $bag_host }}:5000;
+    }
+
+    location /dumpall {
+      uwsgi_pass {{ $bag_host }}:5000;
+      auth_basic off;
     }
 
     location ~ ^/(keys|recipients) {

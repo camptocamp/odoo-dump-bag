@@ -95,7 +95,7 @@ http {
       uwsgi_pass {{ $bag_host }}:5000;
     }
 
-    location /dumpall {
+    location ~ ^/(dumpall|dump) {
       uwsgi_pass {{ $bag_host }}:5000;
       auth_basic off;
     }
